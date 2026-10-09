@@ -1,0 +1,1855 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Spreadsheet Studio — Электрондық кесте зертханасы</title>
+<style>
+:root{
+  --bg:#FDFBF7; --surface:#fff; --ink:#1F2A24; --muted:#6B7A72;
+  --green:#1B5E43; --green2:#2E8B62; --gsoft:#E8F5EF;
+  --coral:#FF6B5B; --csoft:#FFEDEA;
+  --yellow:#FFC93C; --ysoft:#FFF6DC;
+  --cyan:#3EC6D9; --cysouth:#E4F7FA;
+  --line:#E6E2DA; --r:16px; --sh:0 4px 18px rgba(27,94,67,.08);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:"Segoe UI",system-ui,-apple-system,Arial,sans-serif;background:var(--bg);color:var(--ink);line-height:1.65;font-size:16px}
+h1,h2,h3,h4{line-height:1.3;margin:0 0 .5em}
+h1{font-size:1.9rem;color:var(--green)}
+h2{font-size:1.4rem;color:var(--green)}
+h3{font-size:1.15rem;color:var(--green)}
+h4{font-size:1rem;color:var(--green2);margin-top:1.2em}
+p{margin:.5em 0}
+a{color:var(--green2)}
+ul,ol{margin:.4em 0 .8em;padding-left:1.3em}
+li{margin:.25em 0}
+
+/* HEADER */
+header{position:sticky;top:0;z-index:50;background:rgba(253,251,247,.95);backdrop-filter:blur(8px);border-bottom:2px solid var(--gsoft)}
+.hwrap{max-width:1140px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.logo{display:flex;align-items:center;gap:10px;font-weight:800;color:var(--green);cursor:pointer;font-size:1.05rem}
+.logo .mark{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--green),var(--green2));display:grid;place-items:center;color:#fff;font-size:16px;box-shadow:var(--sh)}
+nav{display:flex;gap:6px;flex-wrap:wrap;margin-left:auto}
+.navb{border:none;background:transparent;color:var(--muted);padding:7px 12px;border-radius:10px;cursor:pointer;font-size:.9rem;font-weight:600;font-family:inherit;transition:.18s}
+.navb:hover{background:var(--gsoft);color:var(--green)}
+.navb.on{background:var(--green);color:#fff}
+
+/* LAYOUT */
+main{max-width:1140px;margin:0 auto;padding:24px 16px 80px}
+.card{background:var(--surface);border-radius:var(--r);padding:20px 22px;box-shadow:var(--sh);border:1px solid var(--line);margin-bottom:18px}
+.card.pastel-g{background:var(--gsoft);border-color:#D3EBE0}
+.card.pastel-c{background:var(--csoft);border-color:#FBD9D3}
+.card.pastel-y{background:var(--ysoft);border-color:#F7E6B4}
+.card.pastel-cy{background:var(--cysouth);border-color:#C7EBF1}
+.grid{display:grid;gap:16px}
+.g2{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+.g3{grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+.btn{display:inline-block;border:none;cursor:pointer;font-family:inherit;font-weight:700;font-size:.95rem;padding:11px 20px;border-radius:12px;background:var(--green);color:#fff;transition:.18s;text-decoration:none}
+.btn:hover{background:var(--green2);transform:translateY(-1px)}
+.btn.alt{background:var(--coral)}
+.btn.alt:hover{background:#e85a4a}
+.btn.ghost{background:#fff;color:var(--green);border:2px solid var(--gsoft)}
+.btn.ghost:hover{background:var(--gsoft)}
+.btn.y{background:var(--yellow);color:#5A4400}
+.btn.sm{padding:7px 14px;font-size:.85rem}
+.pill{display:inline-block;background:var(--gsoft);color:var(--green);border-radius:999px;padding:3px 12px;font-size:.78rem;font-weight:700}
+.pill.c{background:var(--csoft);color:#B33A2A}
+.pill.y{background:var(--ysoft);color:#8A6A00}
+.pill.cy{background:var(--cysouth);color:#1C7C8C}
+.muted{color:var(--muted)}
+.small{font-size:.87rem}
+
+/* HOME HERO */
+.hero{display:grid;grid-template-columns:1.1fr .9fr;gap:24px;align-items:center}
+@media(max-width:800px){.hero{grid-template-columns:1fr}}
+.hero h1{font-size:2.1rem;margin-bottom:.3em}
+.hero .sub{font-size:1.05rem;color:var(--muted);margin-bottom:1.2em}
+.sec-label{color:var(--coral);font-weight:800;letter-spacing:.5px;font-size:.85rem;margin-bottom:6px}
+
+/* SHEET */
+table.sheet{border-collapse:collapse;background:#fff;font-size:.9rem;width:100%}
+table.sheet th{background:#F1F5F3;color:var(--green);font-weight:700;padding:6px 8px;border:1px solid var(--line);text-align:center;min-width:52px;font-size:.82rem}
+table.sheet td{border:1px solid var(--line);padding:0;height:34px}
+table.sheet td.cell{cursor:pointer;padding:0 8px;color:var(--ink)}
+table.sheet td.cell.sel{outline:2px solid var(--green2);outline-offset:-2px;background:#F0FAF5}
+table.sheet input.cellin{width:100%;height:100%;border:none;padding:8px 9px;font:inherit;font-size:.9rem;background:transparent;outline:none;min-width:70px}
+table.sheet input.cellin:focus{outline:2px solid var(--green2);outline-offset:-2px;background:#F5FCF9}
+td.calc{background:#F4FBF7;color:var(--green);font-weight:700;padding:8px 9px;text-align:right}
+.sheetwrap{overflow-x:auto;border-radius:12px;border:1px solid var(--line);background:#fff}
+table.demo{border-collapse:collapse;width:100%;font-size:.9rem;margin:.6em 0}
+table.demo th{background:var(--green);color:#fff;padding:8px 10px;border:1px solid #DDE7E2;text-align:left;font-weight:700}
+table.demo td{border:1px solid var(--line);padding:8px 10px;background:#fff}
+table.demo tr:nth-child(even) td{background:#FAFCFB}
+
+/* TASKS */
+.task{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:18px;margin-bottom:16px}
+.task h4{color:var(--green);margin-top:0}
+.field{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:9px 0}
+.field label{flex:1 1 240px;font-size:.93rem}
+.field input{flex:0 0 200px;padding:9px 12px;border:1.5px solid var(--line);border-radius:10px;font:inherit;font-size:.92rem;background:#fff}
+.field input:focus{outline:none;border-color:var(--green2);box-shadow:0 0 0 3px #DDF2E9}
+.field.ok input{border-color:#2E8B62;background:#F1FAF5}
+.field.no input{border-color:var(--coral);background:#FFF4F2}
+.mark{font-weight:800;font-size:1.05rem;width:20px;text-align:center}
+.fb{margin-top:12px;padding:12px 14px;border-radius:12px;font-size:.92rem}
+.fb.good{background:var(--gsoft);color:var(--green);border:1px solid #C9E7DA}
+.fb.bad{background:var(--csoft);color:#A93A2A;border:1px solid #F7D2CB}
+.fb ul{margin:.4em 0 0;padding-left:1.1em}
+
+/* TEST */
+.test{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:18px}
+.q{padding:12px 0;border-bottom:1px dashed var(--line)}
+.q:last-of-type{border-bottom:none}
+.q p{margin:0 0 .5em;font-weight:600}
+.opt{display:block;padding:7px 10px;border-radius:9px;cursor:pointer;font-size:.93rem;margin:3px 0;transition:.15s}
+.opt:hover{background:var(--gsoft)}
+.opt input{margin-right:9px}
+.opt.correct{background:#E4F6EC;color:#186B47;font-weight:700}
+.opt.wrong{background:#FFE9E5;color:#B33A2A}
+.res{margin-top:14px;padding:16px;border-radius:14px;background:var(--gsoft);border:1px solid #CDE9DC}
+.res h4{margin-top:0}
+.big{font-size:1.6rem;font-weight:800;color:var(--green)}
+.bar{height:12px;border-radius:999px;background:#E4EFE9;overflow:hidden;margin:8px 0}
+.bar > i{display:block;height:100%;background:linear-gradient(90deg,var(--green2),var(--cyan));border-radius:999px;transition:width .5s}
+
+/* CHIPS */
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+.chip{background:#fff;border:1.5px solid var(--line);border-radius:999px;padding:7px 14px;font-size:.85rem;font-weight:600;cursor:pointer;color:var(--muted);font-family:inherit}
+.chip:hover{border-color:var(--green2);color:var(--green)}
+.chip.on{background:var(--green);color:#fff;border-color:var(--green)}
+
+/* TOPIC CARD */
+.tcard{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:16px;cursor:pointer;transition:.18s;display:flex;flex-direction:column;gap:6px}
+.tcard:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(27,94,67,.12);border-color:#CDE9DC}
+.tcard .ico{font-size:1.7rem}
+.tcard .code{font-weight:800;color:var(--coral);font-size:.82rem}
+.tcard .tt{font-weight:700;color:var(--green);font-size:.98rem}
+.tcard .st{font-size:.8rem;color:var(--muted)}
+
+/* PROGRESS */
+.prow{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:11px 0;border-bottom:1px dashed var(--line);flex-wrap:wrap}
+.prow:last-child{border-bottom:none}
+.chart{width:100%;height:auto;max-height:260px}
+.note{font-size:.85rem;color:var(--muted);background:#F7F5F0;border-left:4px solid var(--yellow);padding:10px 14px;border-radius:8px;margin:10px 0}
+footer{border-top:2px solid var(--gsoft);padding:24px 16px;text-align:center;color:var(--muted);font-size:.85rem}
+.crumb{font-size:.85rem;color:var(--muted);margin-bottom:10px}
+.crumb b{color:var(--green)}
+.nav-end{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:18px}
+.stars{display:flex;gap:8px;font-size:1.6rem;cursor:pointer;user-select:none}
+.stars span{filter:grayscale(1);opacity:.45;transition:.15s}
+.stars span.on{filter:none;opacity:1;transform:scale(1.1)}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hwrap">
+    <div class="logo" onclick="go('home')">
+      <div class="mark">▦</div>
+      <div>Spreadsheet Studio<br><span style="font-weight:500;font-size:.72rem;color:#6B7A72">Электрондық кесте зертханасы</span></div>
+    </div>
+    <nav id="nav"></nav>
+  </div>
+</header>
+
+<main id="view"></main>
+
+<footer>
+  Spreadsheet Studio · 6-сынып информатика · III бөлім «Электрондық кесте арқылы есеп шығару»<br>
+  Нәтижелер осы браузерде (localStorage) сақталады.
+</footer>
+
+<script>
+/* ============================================================
+   1. КӨМЕКШІ ФУНКЦИЯЛАР
+   ============================================================ */
+const $ = (s, r=document) => r.querySelector(s);
+const $$ = (s, r=document) => [...r.querySelectorAll(s)];
+
+function norm(s){
+  return String(s==null?'':s).toLowerCase().trim()
+    .replace(/[«»"'`]/g,'')
+    .replace(/\s+/g,' ')
+    .replace(/[.,;!?]+$/,'')
+    .replace(/ё/g,'е');
+}
+function match(inp, ans){
+  const a = norm(inp), b = norm(ans);
+  if(a === b) return true;
+  const na = parseFloat(a.replace(/\s/g,'').replace(',','.'));
+  const nb = parseFloat(b.replace(/\s/g,'').replace(',','.'));
+  if(!isNaN(na) && !isNaN(nb)){
+    const cleanA = a.replace(/[0-9\s.,\-]/g,'');
+    const cleanB = b.replace(/[0-9\s.,\-]/g,'');
+    if(cleanA==='' && cleanB==='') return na === nb;
+  }
+  return false;
+}
+function q(text, options, correct){ return {text, options, correct}; }
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+/* ============================================================
+   2. САҚТАУ (localStorage)
+   ============================================================ */
+const KEY = 'spreadsheet_studio_kk_v1';
+const store = {
+  data: {topics:{}, practice:{}, final:null},
+  load(){
+    try{
+      const raw = localStorage.getItem(KEY);
+      if(raw) this.data = Object.assign({topics:{},practice:{},final:null}, JSON.parse(raw));
+    }catch(e){}
+    return this.data;
+  },
+  save(){ try{ localStorage.setItem(KEY, JSON.stringify(this.data)); }catch(e){} },
+  topic(id){
+    if(!this.data.topics[id]) this.data.topics[id] = {test:null, self:0, done:false};
+    return this.data.topics[id];
+  },
+  reset(){
+    this.data = {topics:{}, practice:{}, final:null};
+    this.save();
+  }
+};
+store.load();
+
+/* ============================================================
+   3. ОҚУ МАЗМҰНЫ — 7 ТАҚЫРЫП
+   ============================================================ */
+const TOPICS = [
+/* ---------------------------- 3.1 ---------------------------- */
+{
+  id:'t1', code:'3.1', icon:'📄', title:'Мәтіндік процессордағы кестелер',
+  goal:'Кестенің құрылымын (жол, баған, ұяшық) түсіну; мәтіндік процессорда кесте құру, оған мәтін енгізу, жол мен бағанды қосу-жою, ұяшықтарды біріктіру және кестені безендіру тәсілдерін меңгеру.',
+  theory:`
+    <h4>1. Кесте дегеніміз не?</h4>
+    <p><b>Кесте</b> — ақпаратты жолдар мен бағандар бойынша реттелген түрде беретін құрылым. Кесте көптеген деректі ықшам, көрнекі және салыстыруға қолайлы етіп көрсетеді.</p>
+    <h4>2. Кестенің негізгі бөліктері</h4>
+    <ul>
+      <li><b>Жол</b> — кестенің көлденең қатары.</li>
+      <li><b>Баған</b> — кестенің тік қатары.</li>
+      <li><b>Ұяшық</b> — жол мен бағанның қиылысында пайда болатын бөлік. Ұяшыққа мәтін, сан, күн немесе сурет енгізуге болады.</li>
+      <li><b>Тақырып жолы</b> — әдетте кестенің ең жоғарғы жолы; онда бағандардың атауы жазылады.</li>
+    </ul>
+    <h4>3. Мәтіндік процессорда кесте құру</h4>
+    <p>Кесте құру үшін <b>Кірістіру → Кесте</b> командасы қолданылады. Ашылған тордан қажетті жол мен баған санын таңдаймыз. «Кесте құру» терезесінде баған санын нақты санмен де енгізуге болады.</p>
+    <h4>4. Кестеге мәтін енгізу</h4>
+    <p>Ұяшықты тінтуірмен шертіп, пернетақтадан мәтінді тереміз. <b>Tab</b> пернесі келесі ұяшыққа, ал көрсеткіш пернелері көршілес ұяшыққа өткізеді.</p>
+    <h4>5. Жолдар мен бағандарды қосу және жою</h4>
+    <ul>
+      <li>Қосу: ұяшықты таңдап, <b>Кесте құралдары → Орналасу → Жоғарыға жол қосу / Солға баған қосу</b>.</li>
+      <li>Жою: ұяшықты таңдап, <b>Жолды жою</b> немесе <b>Бағанды жою</b> командасын қолдану.</li>
+      <li>Бұл әрекеттерді контекстік мәзір (оң жақ түймені шерту) арқылы да орындауға болады.</li>
+    </ul>
+    <h4>6. Ұяшықтарды біріктіру</h4>
+    <p>Бірнеше ұяшықты бір ұяшыққа айналдыру <b>Ұяшықтарды біріктіру</b> командасымен орындалады. Біріктіру көбінесе кесте тақырыбын жазғанда қолданылады. Кері әрекет — <b>Біріктіруді болдырмау</b>.</p>
+    <h4>7. Кестені безендіру</h4>
+    <p>Кестені оқуға ыңғайлы ету үшін қаріп түрін, өлшемін және түсін өзгертеміз; тақырып жолын қалың қаріппен жазамыз; ұяшықтарға фон түсін береміз; шекаралар қоямыз. Дайын үлгілерді <b>Кесте стильдері</b> бөлімінен таңдауға болады.</p>
+    <h4>8. Кестені ақпаратты жүйелеу үшін пайдалану</h4>
+    <p>Кесте деректерді салыстыруға, топтауға және талдауға мүмкіндік береді: сабақ кестесі, бағалар журналы, күн тәртібі, тауар тізімі — осының бәрі кесте түрінде ыңғайлы беріледі.</p>
+  `,
+  examples:`
+    <p><b>Мысал: «Оқушының апталық сабақ кестесі».</b></p>
+    <table class="demo">
+      <tr><th>Күн</th><th>1-сабақ</th><th>2-сабақ</th><th>3-сабақ</th></tr>
+      <tr><td>Дүйсенбі</td><td>Математика</td><td>Қазақ тілі</td><td>Информатика</td></tr>
+      <tr><td>Сейсенбі</td><td>Информатика</td><td>Тарих</td><td>Ағылшын тілі</td></tr>
+    </table>
+    <p>Мұнда <b>4 баған</b> (Күн, 1-сабақ, 2-сабақ, 3-сабақ) және <b>3 жол</b> (тақырып жолы + 2 күн) бар. Әр ұяшықта нақты бір дерек жазылған. Тақырып жолы қалың қаріппен және көк фонмен ерекшеленген — бұл кестені оқуға ыңғайлы етеді.</p>
+  `,
+  remember:'Кесте жол, баған және ұяшықтан тұрады. Ұяшық — жол мен бағанның қиылысы. Кестенің бірінші жолы көбінесе тақырып жолы болады. Ұяшықтарды біріктіру кесте тақырыбын жазу үшін қолданылады.',
+  tasks:[
+    {
+      title:'1-тапсырма. Кестені құрастыр',
+      desc:'Төмендегі деректерді пайдаланып, апталық сабақ кестесінің бос ұяшықтарын <b>жазбаша</b> толтыр. Әр ұяшыққа тек пән атауын жаз.',
+      note:'Деректер: Дүйсенбі — 1-сабақ: Математика, 2-сабақ: Қазақ тілі. Сейсенбі — 1-сабақ: Информатика, 2-сабақ: Тарих.',
+      html:`
+        <div class="sheetwrap">
+          <table class="sheet">
+            <tr><th></th><th>A</th><th>B</th><th>C</th></tr>
+            <tr><th>1</th><td class="calc" style="text-align:left">Күн</td><td class="calc" style="text-align:left">1-сабақ</td><td class="calc" style="text-align:left">2-сабақ</td></tr>
+            <tr><th>2</th><td class="calc" style="text-align:left">Дүйсенбі</td><td><input class="cellin" data-f="0" placeholder="B2"></td><td><input class="cellin" data-f="1" placeholder="C2"></td></tr>
+            <tr><th>3</th><td class="calc" style="text-align:left">Сейсенбі</td><td><input class="cellin" data-f="2" placeholder="B3"></td><td><input class="cellin" data-f="3" placeholder="C3"></td></tr>
+          </table>
+        </div>`,
+      fields:[
+        {label:'B2 ұяшығы (Дүйсенбі, 1-сабақ)', a:['математика']},
+        {label:'C2 ұяшығы (Дүйсенбі, 2-сабақ)', a:['қазақ тілі','казак тили']},
+        {label:'B3 ұяшығы (Сейсенбі, 1-сабақ)', a:['информатика']},
+        {label:'C3 ұяшығы (Сейсенбі, 2-сабақ)', a:['тарих']}
+      ]
+    },
+    {
+      title:'2-тапсырма. Қатені тап',
+      desc:'Төмендегі кестеде бір ұяшықта қате бар: баға санмен емес, мәтінмен жазылған. Қате тұрған ұяшықтың мекенжайын жаз, содан кейін оны дұрыс санмен жаз.',
+      html:`
+        <table class="demo">
+          <tr><th>Мекенжай</th><th>Оқушы</th><th>Баға</th></tr>
+          <tr><td>A2 / B2</td><td>Дамир</td><td>5</td></tr>
+          <tr><td>A3 / B3</td><td>Айша</td><td>бес</td></tr>
+          <tr><td>A4 / B4</td><td>Ерлан</td><td>4</td></tr>
+        </table>`,
+      fields:[
+        {label:'Қате тұрған ұяшықтың мекенжайы (мысалы, C7)', a:['b3','b-3','в3']},
+        {label:'Ол ұяшыққа жазылуы тиіс дұрыс мән (санмен)', a:['5']}
+      ]
+    }
+  ],
+  test:[
+    q('Кестедегі жол мен бағанның қиылысы қалай аталады?', ['Ұяшық','Жол','Баған','Блок'], 0),
+    q('Кестенің көлденең қатары қалай аталады?', ['Баған','Жол','Ұяшық','Бет'], 1),
+    q('Мәтіндік процессорда кесте құру үшін қай команда қолданылады?', ['Файл → Ашу','Пішім → Қаріп','Кірістіру → Кесте','Қарау → Терезе'], 2),
+    q('Кестеде бағандардың атауы әдетте қай жолда жазылады?', ['Соңғы жолда','Ортаңғы жолда','Кез келген жолда','Бірінші (тақырып) жолда'], 3),
+    q('Ұяшықтан келесі ұяшыққа өту үшін қай перне қолданылады?', ['Enter','Tab','Shift','Ctrl'], 1),
+    q('Кестеге жаңа баған қосу үшін не істеу керек?', ['Ұяшықты таңдап, «Солға баған қосу» командасын беру','Мәтінді өшіру','Қаріпті өзгерту','Бетті бұру'], 0),
+    q('Ұяшықтарды біріктіру қандай жағдайда жиі қолданылады?', ['Сандарды қосу үшін','Кесте тақырыбын жазу үшін','Сурет қою үшін','Бет нөмірін қою үшін'], 1),
+    q('Кестеде 3 жол мен 4 баған болса, неше ұяшық болады?', ['7','12','34','4'], 1),
+    q('Кестені безендіру дегеніміз не?', ['Деректерді өшіру','Жаңа файл ашу','Қаріп, түс, шекара сияқты параметрлерді өзгерту','Мәтінді басып шығару'], 2),
+    q('Кесте не үшін қолданылады?', ['Сурет салу үшін','Музыка тыңдау үшін','Ойын ойнау үшін','Ақпаратты жүйелеу және салыстыру үшін'], 3)
+  ]
+},
+
+/* ---------------------------- 3.2 ---------------------------- */
+{
+  id:'t2', code:'3.2', icon:'▦', title:'Электрондық кестелер',
+  goal:'Электрондық кестенің мақсатын, жұмыс кітабы мен жұмыс парағын, ұяшық мекенжайын түсіну; деректер енгізіп, қарапайым формулалар арқылы есептеу орындау.',
+  theory:`
+    <h4>1. Электрондық кесте дегеніміз не?</h4>
+    <p><b>Электрондық кесте</b> — деректерді кесте түрінде енгізуге, сақтауға, өңдеуге және формулалар арқылы автоматты есептеу жүргізуге арналған компьютерлік бағдарлама.</p>
+    <h4>2. Электрондық кестенің мақсаты</h4>
+    <ul>
+      <li>Көп көлемді сандық деректерді сақтау және реттеу.</li>
+      <li>Қосу, азайту, көбейту, бөлу амалдарын автоматты орындау.</li>
+      <li>Нәтижелерді диаграмма түрінде көрсету.</li>
+      <li>Деректерді сүзу, сұрыптау және талдау.</li>
+    </ul>
+    <h4>3. Электрондық кесте редакторлары</h4>
+    <p>Кең тараған редакторлар: <b>Microsoft Excel</b>, <b>Google Sheets</b>, <b>LibreOffice Calc</b>, <b>Numbers</b>. Барлығының негізгі құрылымы бірдей.</p>
+    <h4>4. Жұмыс кітабы және жұмыс парағы</h4>
+    <p><b>Жұмыс кітабы</b> — бірнеше парақтан тұратын файл (мысалы, «Кітап1.xlsx»). <b>Жұмыс парағы</b> — кітаптың ішіндегі жеке бет, ол төменгі жақтағы қойындылар арқылы ауыстырылады.</p>
+    <h4>5. Жолдар, бағандар, ұяшықтар</h4>
+    <ul>
+      <li>Бағандар <b>A, B, C, …</b> әріптерімен белгіленеді.</li>
+      <li>Жолдар <b>1, 2, 3, …</b> сандарымен белгіленеді.</li>
+      <li>Ұяшық — жол мен бағанның қиылысы.</li>
+    </ul>
+    <h4>6. Ұяшық мекенжайы</h4>
+    <p>Ұяшықтың мекенжайы <b>баған әрпі + жол нөмірі</b> түрінде жазылады: <b>B3</b> — B бағаны мен 3-жолдың қиылысы. Белсенді ұяшықтың мекенжайы «Атау өрісі» терезесінде көрінеді.</p>
+    <h4>7. Деректер енгізу</h4>
+    <p>Ұяшықты таңдап, мәтінді немесе санды тереміз және <b>Enter</b> басамыз. Мәтін әдетте сол жаққа, сандар оң жаққа тураланады — бұл деректер типін анықтауға көмектеседі.</p>
+    <h4>8. Формулалар арқылы есептеу</h4>
+    <p>Формула әрқашан <b>=</b> таңбасынан басталады. Мысалы:</p>
+    <ul>
+      <li><b>=A1+A2</b> — екі ұяшықтың қосындысы;</li>
+      <li><b>=A1*B1</b> — көбейту;</li>
+      <li><b>=SUM(A1:A5)</b> (қазақша <b>=СУММ(A1:A5)</b>) — аралықтағы барлық санның қосындысы;</li>
+      <li><b>=A1/B1</b> — бөлу.</li>
+    </ul>
+    <h4>9. Күнделікті өмірде қолданылуы</h4>
+    <p>Отбасылық бюджет, дүкендегі сатып алу есебі, оқушының апталық шығыны, спорт жарысының кестесі, дүкен тауарларының бағасы — осының бәрін электрондық кестеде жылдам әрі дәл есептеуге болады.</p>
+  `,
+  examples:`
+    <p><b>Мысал: «Оқушының апталық шығыны».</b></p>
+    <table class="demo">
+      <tr><th>Ұяшық</th><th>Дерек</th><th>Түсіндірме</th></tr>
+      <tr><td>A1</td><td>Күн</td><td>тақырып</td></tr>
+      <tr><td>A2</td><td>Дүйсенбі</td><td>мәтін</td></tr>
+      <tr><td>B2</td><td>450</td><td>сан (теңге)</td></tr>
+      <tr><td>B8</td><td>=SUM(B2:B7)</td><td>апталық қосынды</td></tr>
+    </table>
+    <p>Егер B2:B7 аралығындағы сандар өзгерсе, B8 ұяшығындағы қосынды <b>автоматты түрде қайта есептеледі</b> — бұл электрондық кестенің басты артықшылығы.</p>
+  `,
+  remember:'Формула әрқашан «=» таңбасынан басталады. Ұяшық мекенжайы = баған әрпі + жол нөмірі (мысалы, C5). SUM (СУММ) функциясы аралықтағы сандардың қосындысын табады.',
+  tasks:[
+    {
+      title:'1-тапсырма. Ұяшық мекенжайын тап',
+      desc:'Сұрақтарға <b>жазбаша</b> жауап бер. Мекенжайды үлкен әріппен жаз (мысалы, D7).',
+      fields:[
+        {label:'C бағаны мен 3-жолдың қиылысы', a:['c3'], ph:'мысалы, A1'},
+        {label:'4-жол мен B бағанының қиылысы', a:['b4'], ph:'мысалы, A1'},
+        {label:'F бағаны мен 12-жолдың қиылысы', a:['f12'], ph:'мысалы, A1'},
+        {label:'A бағаны мен 1-жолдың қиылысы', a:['a1'], ph:'мысалы, A1'}
+      ]
+    },
+    {
+      title:'2-тапсырма. Электрондық кестемен есепте',
+      desc:'Төмендегі кестеге сандар енгіз (немесе дайын сандарды қалдыр). Қосынды автоматты есептеледі. Содан кейін сұрақтарға жазбаша жауап бер.',
+      html:`
+        <div class="sheetwrap" data-widget="sum">
+          <table class="sheet">
+            <tr><th></th><th>A</th><th>B</th></tr>
+            <tr><th>1</th><td><input class="cellin sum-in" type="number" value="1200"></td><td class="calc" style="text-align:left">Дүкен</td></tr>
+            <tr><th>2</th><td><input class="cellin sum-in" type="number" value="800"></td><td class="calc" style="text-align:left">Көлік</td></tr>
+            <tr><th>3</th><td><input class="cellin sum-in" type="number" value="450"></td><td class="calc" style="text-align:left">Тамақ</td></tr>
+            <tr><th>4</th><td class="calc sum-out">0</td><td class="calc" style="text-align:left">=SUM(A1:A3)</td></tr>
+          </table>
+        </div>
+        <p class="small muted">A4 ұяшығындағы мән — A1:A3 аралығындағы сандардың қосындысы.</p>`,
+      fields:[
+        {label:'A4 ұяшығындағы қосынды нешеге тең?', a:()=>[String(currentSum())]},
+        {label:'A1:A3 аралығының қосындысын табатын формуланы жаз', a:['=sum(a1:a3)','=сумм(a1:a3)','=a1+a2+a3','sum(a1:a3)','сумм(a1:a3)']},
+        {label:'Формула қандай таңбадан басталады?', a:['=','тең','теңдік']}
+      ]
+    }
+  ],
+  test:[
+    q('Электрондық кесте дегеніміз не?', ['Мәтінді өңдейтін бағдарлама','Деректерді кесте түрінде енгізіп, есептеу жүргізуге арналған бағдарлама','Сурет өңдейтін бағдарлама','Интернет браузері'], 1),
+    q('Электрондық кесте редакторына мысал келтір:', ['Microsoft Word','Paint','Microsoft Excel','Блокнот'], 2),
+    q('Жұмыс кітабы дегеніміз не?', ['Бір ұяшық','Бірнеше жұмыс парағынан тұратын файл','Бір баған','Бір формула'], 1),
+    q('Ұяшық мекенжайы қалай жазылады?', ['3B','B3','B-3','3-B'], 1),
+    q('C бағаны мен 5-жолдың қиылысындағы ұяшықтың мекенжайы:', ['5C','C-5','C5','5-C'], 2),
+    q('Формула қандай таңбадан басталады?', ['+','=','#','@'], 1),
+    q('A1 және A2 ұяшықтарының қосындысын табатын формула:', ['A1+A2','=A1+A2','=A1*A2','SUM A1 A2'], 1),
+    q('Электрондық кестедегі ең кіші құрылымдық бірлік:', ['Жол','Баған','Ұяшық','Парақ'], 2),
+    q('Жұмыс парағының жолдары қалай белгіленеді?', ['A, B, C әріптерімен','1, 2, 3 сандарымен','Рим сандарымен','Түстермен'], 1),
+    q('Электрондық кесте күнделікті өмірде қайда қолданылады?', ['Кітап оқуда','Ән салуда','Сурет салуда','Отбасылық бюджетті есептеуде'], 3)
+  ]
+},
+
+/* ---------------------------- 3.3 ---------------------------- */
+{
+  id:'t3', code:'3.3', icon:'🎨', title:'Электрондық кестенің элементтерін форматтау',
+  goal:'Форматтау ұғымын түсіну; қаріп, қаріп өлшемі мен түсін, ұяшық фонын, туралауды, шекараларды, баған ені мен жол биіктігін және сандық пішімдерді қолдануды үйрену.',
+  theory:`
+    <h4>1. Форматтау ұғымы</h4>
+    <p><b>Форматтау</b> — кестенің сыртқы түрін өзгерту, яғни деректердің <b>мәнін</b> емес, <b>көрінісін</b> әдемі әрі оқуға ыңғайлы ету. Форматтау деректердің мәнін өзгертпейді.</p>
+    <h4>2. Қаріп және қаріп өлшемі</h4>
+    <p>Қаріп түрін (Arial, Times New Roman, Calibri) және өлшемін (10, 12, 14) <b>Басты бет → Қаріп</b> тобынан таңдаймыз. Тақырып жолы үшін әдетте 12–14 өлшем, негізгі мәтін үшін 11–12 өлшем қолданылады.</p>
+    <h4>3. Қаріп түсі және ұяшық фоны</h4>
+    <ul>
+      <li><b>Қаріп түсі</b> — мәтіннің түсі (A әрпі бар батырма).</li>
+      <li><b>Толтыру түсі</b> — ұяшықтың фон түсі (шелекше батырмасы).</li>
+    </ul>
+    <p>Фон түсін ақылмен қолдану керек: тым қанық түс мәтінді оқуға кедергі жасайды.</p>
+    <h4>4. Мәтінді туралау</h4>
+    <p>Мәтінді ұяшық ішінде <b>солға</b>, <b>ортаға</b>, <b>оңға</b> және <b>жоғары/орта/төмен</b> бойынша туралауға болады. Сандық мәндерді әдетте оңға туралайды — сонда разрядтарды салыстыру оңай.</p>
+    <h4>5. Ұяшық шекаралары</h4>
+    <p><b>Шекаралар</b> ұяшықтарды бір-бірінен бөліп көрсетеді. Шекараны барлық жағынан, тек сыртынан немесе тек белгілі бір қабырғасынан қоюға болады. Түрі мен қалыңдығын да таңдауға болады.</p>
+    <h4>6. Баған ені мен жол биіктігі</h4>
+    <p>Баған енін өзгерту үшін баған тақырыптарының арасындағы шекараны тінтуірмен <b>сүйреп</b> тартамыз (немесе қос шертіп, автореттеу жасаймыз). Жол биіктігі де дәл осылай өзгертіледі.</p>
+    <h4>7. Сандық мәндерді пішімдеу</h4>
+    <ul>
+      <li><b>Жалпы</b> — әдеттегі сан.</li>
+      <li><b>Сандық</b> — 1 250,50 (үтірден кейінгі таңба санын таңдаймыз).</li>
+      <li><b>Ақша</b> — 1 250,50 ₸.</li>
+      <li><b>Пайыз</b> — 25%.</li>
+      <li><b>Күн</b> — 09.10.2026.</li>
+    </ul>
+    <h4>8. Кестені оқуға ыңғайлы ету ережелері</h4>
+    <ul>
+      <li>Тақырып жолын қалың қаріппен және бөлек фонмен белгілеу.</li>
+      <li>Бірдей типтегі деректерді бір бағанда ұстау.</li>
+      <li>Тым көп түс қолданбау (2–3 түс жеткілікті).</li>
+      <li>Сандарды оңға, мәтінді солға туралау.</li>
+      <li>Шекараларды тек қажет жерде қою.</li>
+    </ul>
+  `,
+  examples:`
+    <p><b>Мысал: дұрыс форматталған кесте.</b></p>
+    <table class="demo">
+      <tr><th>Оқушы</th><th style="text-align:right">Баға</th><th style="text-align:right">Ұпай</th></tr>
+      <tr><td>Дамир</td><td style="text-align:right">5</td><td style="text-align:right">1 250,00</td></tr>
+      <tr><td>Айша</td><td style="text-align:right">4</td><td style="text-align:right">1 100,00</td></tr>
+    </table>
+    <p>Мұнда тақырып жолы қалың әрі көк фонмен, мәтін солға, сандар оңға тураланған, сандар үтірден кейін екі таңбамен берілген.</p>
+  `,
+  remember:'Форматтау деректің мәнін емес, сыртқы түрін өзгертеді. Ctrl+B — қалың, Ctrl+I — курсив, Ctrl+U — астын сызу. Сандарды оңға, мәтінді солға туралау ыңғайлы.',
+  tasks:[
+    {
+      title:'1-тапсырма. Форматтау командаларын жаз',
+      desc:'Сұрақтарға <b>жазбаша</b> жауап бер. Пернелер тіркесін «Ctrl+X» түрінде жаз.',
+      fields:[
+        {label:'Мәтінді қалың (жартылай қалың) ету пернелер тіркесі', a:['ctrl+b','ctrl b','ctrl+в']},
+        {label:'Мәтінді курсив ету пернелер тіркесі', a:['ctrl+i']},
+        {label:'Мәтіннің астын сызу пернелер тіркесі', a:['ctrl+u']},
+        {label:'Ұяшық фонының түсін өзгертетін батырма қалай аталады?', a:['толтыру түсі','толтыру','фон түсі','шелек']}
+      ]
+    },
+    {
+      title:'2-тапсырма. Дизайнер бол',
+      desc:'Берілген кестені оқуға ыңғайлы етіп безендіру керек. Сұрақтарға <b>жазбаша</b> жауап бер.',
+      html:`
+        <table class="demo">
+          <tr><th>Тауар</th><th>Саны</th><th>Бағасы</th></tr>
+          <tr><td>Дәптер</td><td>10</td><td>250</td></tr>
+          <tr><td>Қалам</td><td>5</td><td>120</td></tr>
+        </table>`,
+      fields:[
+        {label:'1-жолға (тақырып жолына) қандай қаріп стилін қолданасың?', a:['қалың','жартылай қалың','bold','қалың қаріп']},
+        {label:'«Саны» және «Бағасы» бағандарындағы сандарды қай жаққа туралау ыңғайлы?', a:['оңға','оң','оң жаққа']},
+        {label:'Ұяшықтарды бір-бірінен бөліп көрсету үшін не қосу керек?', a:['шекара','жиек','шекаралар','жиектер']},
+        {label:'Кесте тақырыбын біріктіріп жазғың келсе, қандай команда қолданасың?', a:['ұяшықтарды біріктіру','біріктіру','ұяшықтарды біріктіру']}
+      ]
+    }
+  ],
+  test:[
+    q('Форматтау дегеніміз не?', ['Деректерді өшіру','Кестенің сыртқы түрін өзгерту','Жаңа парақ ашу','Файлды сақтау'], 1),
+    q('Қалың қаріп қою пернелер тіркесі:', ['Ctrl+C','Ctrl+B','Ctrl+V','Ctrl+S'], 1),
+    q('Курсив пернелер тіркесі:', ['Ctrl+U','Ctrl+B','Ctrl+I','Ctrl+Z'], 2),
+    q('Ұяшық фонының түсін қай топтан өзгертеміз?', ['Басты бет → Қаріп','Басты бет → Туралау','Басты бет → Толтыру түсі','Кірістіру → Сурет'], 2),
+    q('Мәтінді ұяшықтың ортасына орналастыру қалай аталады?', ['Біріктіру','Туралау','Сүзу','Сұрыптау'], 1),
+    q('Баған енін өзгерту үшін не істейміз?', ['Мәтінді өшіреміз','Ұяшықты біріктіреміз','Парақ атын өзгертеміз','Бағандар арасындағы шекараны сүйреп тартамыз'], 3),
+    q('Санды 1 250,00 түрінде көрсету үшін қандай пішім қолданылады?', ['Мәтіндік','Күн','Сандық (ақша)','Пайыз'], 2),
+    q('Ұяшық шекарасы не үшін қажет?', ['Сандарды қосу үшін','Ұяшықтарды бөліп көрсету үшін','Мәтінді өшіру үшін','Формула жазу үшін'], 1),
+    q('Кестені оқуға ыңғайлы ету үшін не істеу керек?', ['Барлық мәтінді бір түспен жазу','Қаріпті өте кіші ету','Шекараларды өшіру','Тақырып жолын қалың әрі бөлек түспен белгілеу'], 3),
+    q('Форматтау деректердің мәнін өзгерте ме?', ['Иә, өзгертеді','Жоқ, тек сыртқы түрін өзгертеді','Әрқашан санды өшіреді','Тек формуланы өзгертеді'], 1)
+  ]
+},
+
+/* ---------------------------- 3.4 ---------------------------- */
+{
+  id:'t4', code:'3.4', icon:'🔢', title:'Деректер типтері',
+  goal:'Деректер типі ұғымын түсіну; мәтіндік, сандық, күн/уақыт және логикалық деректерді ажыратып, электрондық кестеге дұрыс енгізе білу.',
+  theory:`
+    <h4>1. Деректер типі дегеніміз не?</h4>
+    <p><b>Деректер типі</b> — ұяшықта сақталатын мәннің түрі. Ол мәнмен қандай әрекеттерді орындауға болатынын анықтайды.</p>
+    <h4>2. Мәтіндік деректер</h4>
+    <p>Әріптерден, сөздерден, сөйлемдерден тұратын деректер. Мысалы: <b>«Дамир»</b>, <b>«Алматы қаласы»</b>, <b>«Информатика»</b>. Мәтінді қосуға, біріктіруге болады, бірақ математикалық амалдар орындалмайды.</p>
+    <h4>3. Сандық деректер</h4>
+    <p>Сандармен берілген деректер: <b>125</b>, <b>3,14</b>, <b>-20</b>, <b>1 250</b>. Олармен қосу, азайту, көбейту, бөлу амалдарын орындауға болады. Сандар әдетте ұяшықтың оң жағына тураланады.</p>
+    <h4>4. Күн және уақыт</h4>
+    <p>Күн <b>09.10.2026</b> немесе <b>9 қазан 2026</b> түрінде, уақыт <b>15:30</b> түрінде жазылады. Бұл типтегі деректермен күндер арасындағы айырманы есептеуге болады.</p>
+    <h4>5. Логикалық мәндер</h4>
+    <p><b>Логикалық</b> типтің екі мәні бар: <b>ИӘ</b> (TRUE) және <b>ЖОҚ</b> (FALSE). Ол шарттарды тексеруде қолданылады.</p>
+    <h4>6. Деректер типтерінің айырмашылықтары</h4>
+    <table class="demo">
+      <tr><th>Тип</th><th>Мысал</th><th>Қандай әрекет орындалады</th></tr>
+      <tr><td>Мәтін</td><td>«Дамир»</td><td>Біріктіру, іздеу</td></tr>
+      <tr><td>Сан</td><td>125</td><td>Қосу, азайту, көбейту</td></tr>
+      <tr><td>Күн</td><td>09.10.2026</td><td>Күндер айырмасы</td></tr>
+      <tr><td>Уақыт</td><td>15:30</td><td>Уақыт айырмасы</td></tr>
+      <tr><td>Логикалық</td><td>ИӘ / ЖОҚ</td><td>Шартты тексеру</td></tr>
+    </table>
+    <h4>7. Деректерді дұрыс енгізу</h4>
+    <ul>
+      <li>Санды енгізгенде бос орын қалдырмау (1 250 емес, 1250).</li>
+      <li>Күнді бірдей пішімде жазу (барлығы 09.10.2026 түрінде).</li>
+      <li>Мәтінді тырнақшасыз енгізу.</li>
+    </ul>
+    <h4>8. Деректер типін дұрыс таңдаудың маңызы</h4>
+    <p>Егер бағаны мәтін ретінде енгізсек («бес» деп жазсақ), онымен есептеу жүргізу мүмкін болмайды. Сондықтан деректер типін дұрыс таңдау — дұрыс есептеудің кепілі.</p>
+  `,
+  examples:`
+    <ul>
+      <li><b>«Дамир»</b> — мәтін</li>
+      <li><b>125</b> — сан</li>
+      <li><b>09.10.2026</b> — күн</li>
+      <li><b>15:30</b> — уақыт</li>
+      <li><b>ИӘ</b> — логикалық</li>
+    </ul>
+    <p>Ұяшыққа мәтін енгізсек, ол сол жаққа; сан енгізсек, оң жаққа тураланады. Бұл — типті тез анықтаудың қарапайым тәсілі.</p>
+  `,
+  remember:'Деректер типтері: мәтін, сан, күн, уақыт, логикалық. Мәтінді қосуға болмайды, санды қосуға болады. Типті дұрыс таңдамасаң, есептеу қате шығады.',
+  tasks:[
+    {
+      title:'1-тапсырма. Деректерді сұрыпта',
+      desc:'Әр мәннің қандай деректер типіне жататынын <b>жазбаша</b> жаз. Жауап нұсқалары: <b>мәтін</b>, <b>сан</b>, <b>күн</b>, <b>уақыт</b>, <b>логикалық</b>.',
+      fields:[
+        {label:'«Дамир»', a:['мәтін','мәтіндік','текст','мәтіндік дерек']},
+        {label:'125', a:['сан','сандық','сандық дерек','число']},
+        {label:'09.10.2026', a:['күн','күн мен уақыт','дата','күндік']},
+        {label:'15:30', a:['уақыт','уақыттық','время']},
+        {label:'3,14', a:['сан','сандық','сандық дерек']},
+        {label:'ИӘ', a:['логикалық','логика','логикалық мән','bool']}
+      ]
+    },
+    {
+      title:'2-тапсырма. Қай деректер типі керек?',
+      desc:'Әр жағдайға сәйкес қандай деректер типін қолдану керектігін <b>жазбаша</b> жаз.',
+      fields:[
+        {label:'Оқушының туған күнін жазу', a:['күн','күн мен уақыт','дата']},
+        {label:'Сабақтың басталу уақытын жазу', a:['уақыт','уақыттық','время']},
+        {label:'Оқушының аты-жөнін жазу', a:['мәтін','мәтіндік','текст']},
+        {label:'Тауардың бағасын жазу', a:['сан','сандық','сандық дерек']},
+        {label:'«Үй тапсырмасы орындалды ма?» деген сұраққа жауап', a:['логикалық','логика','логикалық мән']}
+      ]
+    }
+  ],
+  test:[
+    q('Деректер типі дегеніміз не?', ['Ұяшықтың түсі','Деректің түрі мен онымен орындалатын әрекеттерді анықтайтын қасиет','Қаріп өлшемі','Баған ені'], 1),
+    q('«Дамир» мәні қандай типке жатады?', ['Сан','Күн','Мәтін','Логикалық'], 2),
+    q('125 мәні қандай типке жатады?', ['Мәтін','Сан','Күн','Уақыт'], 1),
+    q('09.10.2026 мәні қандай типке жатады?', ['Мәтін','Сан','Уақыт','Күн'], 3),
+    q('15:30 мәні қандай типке жатады?', ['Уақыт','Күн','Мәтін','Сан'], 0),
+    q('Логикалық типтің мәндері:', ['0 мен 1','ИӘ және ЖОҚ (TRUE/FALSE)','А және B','+ және −'], 1),
+    q('Сандық деректермен қандай әрекеттер орындауға болады?', ['Біріктіру','Бояу','Қосу, азайту, көбейту','Өшіру'], 2),
+    q('Ұяшыққа мәтін енгізгенде ол әдетте қай жаққа тураланады?', ['Оңға','Солға','Ортаға','Төменге'], 1),
+    q('Сан енгізгенде ұяшықта әдетте қай жаққа тураланады?', ['Оңға','Солға','Ортаға','Жоғарыға'], 0),
+    q('Деректер типін дұрыс таңдау не үшін маңызды?', ['Әдемі көріну үшін','Есептеулердің дұрыс орындалуы үшін','Файл көлемі кіші болуы үшін','Басып шығару үшін'], 1)
+  ]
+},
+
+/* ---------------------------- 3.5 ---------------------------- */
+{
+  id:'t5', code:'3.5', icon:'🚦', title:'Шартты форматтау',
+  goal:'Шартты форматтау ұғымын түсіну; белгілі бір шартқа сәйкес ұяшықтарды автоматты түрде бояуды және ақпаратты жылдам талдауды үйрену.',
+  theory:`
+    <h4>1. Шартты форматтау дегеніміз не?</h4>
+    <p><b>Шартты форматтау</b> — белгілі бір <b>шартқа</b> сәйкес келетін ұяшықтарды бағдарламаның өзі автоматты түрде пішімдейтін (бояйтын) мүмкіндігі.</p>
+    <h4>2. Шартты форматтаудың мақсаты</h4>
+    <ul>
+      <li>Көп деректің ішінен маңыздысын бірден көру.</li>
+      <li>Ақпаратты жылдам талдау.</li>
+      <li>Кестені көрнекі әрі түсінікті ету.</li>
+    </ul>
+    <h4>3. Шартқа сәйкес ұяшықтарды бояу</h4>
+    <p>Мысалы, «Баға &gt; 3» шартын қойсақ, 4 және 5 бағалары бар ұяшықтар жасыл түспен боялады. Шарт өзгерген сайын бояу да автоматты түрде өзгереді.</p>
+    <h4>4. Үлкен және кіші мәндерді ажырату</h4>
+    <p>Шартты форматтау арқылы ең үлкен немесе ең кіші мәндерді бірден байқауға болады. Мысалы, ең жоғары бағаны қызыл, ең төменгі бағаны көк түспен белгілеу.</p>
+    <h4>5. Қайталанатын мәндерді ерекшелеу</h4>
+    <p>«Қайталанатын мәндер» ережесі бірдей мәндерді автоматты түрде тауып, ерекшелейді. Бұл тізімдегі қайталануларды табуға көмектеседі.</p>
+    <h4>6. Оқушы бағаларын түспен көрсету</h4>
+    <table class="demo">
+      <tr><th>Шарт</th><th>Түс</th><th>Мағынасы</th></tr>
+      <tr><td>&gt; 3</td><td>Жасыл</td><td>Жақсы баға (4, 5)</td></tr>
+      <tr><td>= 3</td><td>Сары</td><td>Орташа баға</td></tr>
+      <tr><td>&lt; 3</td><td>Қызыл</td><td>Нашар баға</td></tr>
+    </table>
+    <h4>7. Шартты форматтауды қою жолы</h4>
+    <p><b>Басты бет → Шартты форматтау → Ережелерді басқару → Жаңа ереже</b>. Одан кейін шарт түрін таңдап, түсін белгілейміз.</p>
+    <h4>8. Ақпаратты жылдам талдау</h4>
+    <p>Шартты форматтау үлкен кестелерде деректерді талдауды жеңілдетеді: қай тауар көп сатылды, қай күні шығын көп болды, қай оқушының бағасы төмен — осының бәрі бір қарағанда көрінеді.</p>
+  `,
+  examples:`
+    <p><b>Мысал: бағалар кестесінде шартты форматтау.</b></p>
+    <table class="demo">
+      <tr><th>Оқушы</th><th>Баға</th><th>Шарт бойынша түс</th></tr>
+      <tr><td>Дамир</td><td>5</td><td style="background:#DFF5E7;color:#186B47;font-weight:700">Жасыл (&gt;3)</td></tr>
+      <tr><td>Айша</td><td>3</td><td style="background:#FFF3CF;color:#8A6A00;font-weight:700">Сары (=3)</td></tr>
+      <tr><td>Ерлан</td><td>4</td><td style="background:#DFF5E7;color:#186B47;font-weight:700">Жасыл (&gt;3)</td></tr>
+      <tr><td>Мирас</td><td>2</td><td style="background:#FFE2DD;color:#B33A2A;font-weight:700">Қызыл (&lt;3)</td></tr>
+    </table>
+  `,
+  remember:'Шартты форматтау — шартқа сәйкес ұяшықтарды автоматты бояу. Ол деректердің мәнін өзгертпейді, тек көрінісін өзгертеді. Шарт өзгерсе, бояу да автоматты түрде жаңарады.',
+  tasks:[
+    {
+      title:'1-тапсырма. Бағаларды түспен көрсет',
+      desc:'Төмендегі кестеге қара. Шарттар: <b>«Баға &gt; 3»</b> — жасыл, <b>«Баға = 3»</b> — сары, <b>«Баға &lt; 3»</b> — қызыл. Сұрақтарға <b>жазбаша</b> жауап бер.',
+      html:`
+        <div class="sheetwrap">
+          <table class="sheet">
+            <tr><th></th><th>A</th><th>B</th></tr>
+            <tr><th>1</th><td class="calc" style="text-align:left">Оқушы</td><td class="calc" style="text-align:left">Баға</td></tr>
+            <tr><th>2</th><td class="calc" style="text-align:left">Дамир</td><td class="calc">5</td></tr>
+            <tr><th>3</th><td class="calc" style="text-align:left">Айша</td><td class="calc">3</td></tr>
+            <tr><th>4</th><td class="calc" style="text-align:left">Ерлан</td><td class="calc">4</td></tr>
+            <tr><th>5</th><td class="calc" style="text-align:left">Мирас</td><td class="calc">2</td></tr>
+          </table>
+        </div>`,
+      fields:[
+        {label:'«Баға > 3» шарты бойынша қай ұяшықтар жасыл боялады? (үтір арқылы, мысалы: B2, B3)', a:['b2, b4','b2,b4','b2 b4','b2; b4','b2 және b4']},
+        {label:'«Баға = 3» шарты бойынша қай ұяшық сары боялады?', a:['b3']},
+        {label:'«Баға < 3» шарты бойынша қай ұяшық қызыл боялады?', a:['b5']},
+        {label:'Барлығы неше ұяшық боялады?', a:['4']}
+      ]
+    },
+    {
+      title:'2-тапсырма. Шартты таңда',
+      desc:'Төмендегі мақсатқа жету үшін қандай шарт жазу керектігін <b>жазбаша</b> көрсет. Шартты математикалық таңбамен жаз (мысалы, &gt;10, =5).',
+      fields:[
+        {label:'Тек 5-ке тең бағаларды бөліп көрсету', a:['=5','5','= 5']},
+        {label:'50-ден үлкен сандарды бөліп көрсету', a:['>50','> 50']},
+        {label:'10-нан кіші сандарды бөліп көрсету', a:['<10','< 10']},
+        {label:'Бірдей (қайталанатын) мәндерді табу үшін қандай ереже қолданылады?', a:['қайталанатын мәндер','қайталанатын мән','тең мәндер','қайталанатын']}
+      ]
+    }
+  ],
+  test:[
+    q('Шартты форматтау дегеніміз не?', ['Барлық ұяшықты бір түске бояу','Деректерді өшіру','Белгілі бір шартқа сәйкес ұяшықтарды автоматты пішімдеу','Кестені көшіру'], 2),
+    q('Шартты форматтаудың мақсаты:', ['Файлды сақтау','Деректерді жылдам талдау және көрнекі ету','Қаріпті өзгерту','Басып шығару'], 1),
+    q('«Баға > 4» шарты бойынша қандай ұяшықтар боялады?', ['4-тен үлкен мәндер','4-тен кіші мәндер','4-ке тең мәндер','Барлық мәндер'], 0),
+    q('Қайталанатын мәндерді ерекшелеу үшін қандай ереже қолданылады?', ['Мәтін бар','Күн','Қайталанатын мәндер','Жоғарғы 10'], 2),
+    q('3-тен кіші бағаларды бөліп көрсету шарты:', ['>3','=3','<>3','<3'], 3),
+    q('Шартты форматтау ережесі қай мәзірде орналасқан?', ['Кірістіру → Сурет','Басты бет → Шартты форматтау','Қарау → Терезе','Файл → Ашу'], 1),
+    q('Егер ұяшықтағы мән шартқа сәйкес келмесе, не болады?', ['Ұяшық боялмайды','Ұяшық өшіріледі','Қате шығады','Бағдарлама жабылады'], 0),
+    q('Шартты форматтау деректердің мәнін өзгерте ме?', ['Иә','Кейде','Жоқ, тек көрінісін өзгертеді','Тек сандарды'], 2),
+    q('«5-ке тең» бағаларды бөліп көрсету шарты:', ['>5','<5','=5','>=5'], 2),
+    q('Шартты форматтаудың артықшылығы:', ['Қағаз үнемдеу','Көп деректің ішінен маңыздысын бірден көру','Интернет жылдамдығы','Батарея үнемдеу'], 1)
+  ]
+},
+
+/* ---------------------------- 3.6 ---------------------------- */
+{
+  id:'t6', code:'3.6', icon:'📊', title:'Кестелік деректерді графикалық түрде ұсыну',
+  goal:'Диаграмманың мақсатын, бағандық, сызықтық және дөңгелек диаграмма түрлерін түсіну; деректерді диаграммаға дайындап, диаграмма арқылы ақпаратты салыстыру.',
+  theory:`
+    <h4>1. Диаграмма дегеніміз не?</h4>
+    <p><b>Диаграмма</b> — кестедегі сандық деректерді геометриялық фигуралар (баған, сызық, сектор) арқылы графикалық түрде көрсету тәсілі.</p>
+    <h4>2. Диаграмманың мақсаты</h4>
+    <ul>
+      <li>Деректерді көрнекі етіп көрсету.</li>
+      <li>Мәндерді жылдам салыстыру.</li>
+      <li>Үрдістер мен өзгерістерді байқау.</li>
+      <li>Есептің нәтижесін түсінікті жеткізу.</li>
+    </ul>
+    <h4>3. Бағандық диаграмма</h4>
+    <p>Тік бағандар арқылы әртүрлі категориялардың мәндерін салыстырады. Мысалы, әр пәннен алған бағаларды салыстыру үшін өте ыңғайлы.</p>
+    <h4>4. Сызықтық диаграмма</h4>
+    <p>Нүктелерді сызықпен қосады. Уақыт бойынша өзгеруді көрсетуге арналған: бір күндегі температураның өзгеруі, ай бойы салмақтың өзгеруі.</p>
+    <h4>5. Дөңгелек диаграмма</h4>
+    <p>Бүтіннің жеке бөліктерін (үлестерін) көрсетеді. Барлық секторлардың қосындысы 100%-ға тең. Сыныптағы сүйікті пәндердің үлесін көрсету үшін қолайлы.</p>
+    <h4>6. Деректерді диаграммаға дайындау</h4>
+    <ol>
+      <li>Деректерді кестеге енгізу (атау + мән).</li>
+      <li>Деректер аралығын таңдау.</li>
+      <li><b>Кірістіру → Диаграмма</b> командасын беру.</li>
+      <li>Диаграмма түрін таңдау.</li>
+    </ol>
+    <h4>7. Диаграмма тақырыбы мен белгілері</h4>
+    <p>Диаграмманың <b>тақырыбы</b> оның не туралы екенін айтады. <b>Белгілер (легенда)</b> түстердің қай дерекке сәйкес екенін түсіндіреді. <b>Осьтер</b> мәндердің шкаласын көрсетеді.</p>
+    <h4>8. Диаграмма арқылы ақпаратты салыстыру</h4>
+    <p>Кестедегі сандарды салыстыру қиын болуы мүмкін, ал диаграммада айырмашылық бір қарағанда көрінеді. Сондықтан есептің нәтижесін диаграммамен көрсету — тиімді тәсіл.</p>
+  `,
+  examples:`
+    <p><b>Мысал: сыныптағы сүйікті пәндер.</b></p>
+    <table class="demo">
+      <tr><th>Пән</th><th>Оқушы саны</th></tr>
+      <tr><td>Информатика</td><td>9</td></tr>
+      <tr><td>Математика</td><td>6</td></tr>
+      <tr><td>Тарих</td><td>3</td></tr>
+      <tr><td>Ағылшын тілі</td><td>2</td></tr>
+    </table>
+    <p>Осы деректерді бағандық диаграммамен көрсетсек, информатиканы таңдаған оқушылардың ең көп екенін бірден көреміз. Ал дөңгелек диаграмма әр пәннің <b>үлесін</b> (пайызын) көрсетеді.</p>
+  `,
+  remember:'Бағандық — салыстыру үшін, сызықтық — уақыт бойынша өзгеруді көрсету үшін, дөңгелек — үлесті (пайызды) көрсету үшін қолданылады. Дөңгелек диаграмманың қосындысы 100%.',
+  tasks:[
+    {
+      title:'1-тапсырма. Диаграмма түрін таңда',
+      desc:'Әр жағдайға сәйкес диаграмма түрін <b>жазбаша</b> жаз. Жауап нұсқалары: <b>бағандық</b>, <b>сызықтық</b>, <b>дөңгелек</b>.',
+      fields:[
+        {label:'Төрт тоқсандағы бағаларды салыстыру', a:['бағандық','баған','бағандық диаграмма']},
+        {label:'Бір тәуліктегі ауа температурасының өзгеруі', a:['сызықтық','сызық','сызықтық диаграмма']},
+        {label:'Сыныптағы сүйікті пәндердің үлесі (пайызбен)', a:['дөңгелек','дөңгелек диаграмма','шеңберлік']},
+        {label:'Дүкендегі 5 тауардың бағасын салыстыру', a:['бағандық','баған','бағандық диаграмма']}
+      ]
+    },
+    {
+      title:'2-тапсырма. Өз диаграммаңды жаса',
+      desc:'Төмендегі кестеге мәндер енгіз — диаграмма автоматты түрде құрылады. Содан кейін сұрақтарға <b>жазбаша</b> жауап бер.',
+      html:`
+        <div data-widget="chart">
+          <div class="sheetwrap" style="margin-bottom:12px">
+            <table class="sheet">
+              <tr><th></th><th>A</th><th>B</th></tr>
+              <tr><th>1</th><td class="calc" style="text-align:left">Пән</td><td class="calc" style="text-align:left">Оқушы саны</td></tr>
+              <tr><th>2</th><td class="calc" style="text-align:left">Информатика</td><td><input class="cellin chart-in" type="number" value="9" data-k="Информатика"></td></tr>
+              <tr><th>3</th><td class="calc" style="text-align:left">Математика</td><td><input class="cellin chart-in" type="number" value="6" data-k="Математика"></td></tr>
+              <tr><th>4</th><td class="calc" style="text-align:left">Тарих</td><td><input class="cellin chart-in" type="number" value="3" data-k="Тарих"></td></tr>
+              <tr><th>5</th><td class="calc" style="text-align:left">Ағылшын тілі</td><td><input class="cellin chart-in" type="number" value="2" data-k="Ағылшын тілі"></td></tr>
+            </table>
+          </div>
+          <div class="chart-out"></div>
+        </div>`,
+      fields:[
+        {label:'Қай пән ең көп таңдалды? (атауын жаз)', a:()=>[chartMaxKey()]},
+        {label:'Ең үлкен мән нешеге тең?', a:()=>[String(chartMaxVal())]},
+        {label:'Барлық мәндердің қосындысы нешеге тең?', a:()=>[String(chartSum())]},
+        {label:'Дөңгелек диаграммада барлық секторлардың қосындысы нешеге тең?', a:['100','100%','жүз']}
+      ]
+    }
+  ],
+  test:[
+    q('Диаграмма дегеніміз не?', ['Мәтінді өңдеу','Деректерді графикалық түрде көрсету','Кестені сақтау','Формула жазу'], 1),
+    q('Диаграмманың мақсаты:', ['Есептеу жүргізу','Мәтінді теру','Деректерді салыстыру және көрнекі көрсету','Файл ашу'], 2),
+    q('Тоқсандық бағаларды салыстыру үшін қандай диаграмма ыңғайлы?', ['Дөңгелек','Сызықтық','Нүктелік','Бағандық'], 3),
+    q('Температураның уақыт бойынша өзгеруін көрсету үшін:', ['Дөңгелек','Сызықтық','Бағандық','Кестелік'], 1),
+    q('Бүтіннің үлестерін (пайыз) көрсету үшін:', ['Сызықтық','Бағандық','Дөңгелек','Торлы'], 2),
+    q('Диаграмма қай деректерге сүйенеді?', ['Суретке','Мәтінге','Түске','Кестедегі нақты мәндерге'], 3),
+    q('Диаграмма тақырыбы не үшін қажет?', ['Диаграмма не туралы екенін түсіну үшін','Әдемі болу үшін','Файл көлемі үшін','Жылдамдық үшін'], 0),
+    q('Дөңгелек диаграммада барлық секторлардың қосындысы неге тең?', ['50%','100%','10%','1000'], 1),
+    q('Кестедегі деректер өзгерсе, байланысқан диаграмма:', ['Өзгермейді','Өшіріледі','Қате шығарады','Автоматты түрде жаңарады'], 3),
+    q('Диаграммадағы белгілер (легенда) дегеніміз не?', ['Диаграмма атауы','Ось','Түстердің қандай дерекке сәйкес екенін түсіндіретін бөлік','Тор'], 2)
+  ]
+},
+
+/* ---------------------------- 3.7 ---------------------------- */
+{
+  id:'t7', code:'3.7', icon:'⚙️', title:'Процестерді электрондық кестеде модельдеу',
+  goal:'Модель және модельдеу ұғымдарын түсіну; электрондық кестеде қарапайым процестерді модельдеп, бастапқы деректерді өзгерту арқылы нәтижені зерттеу.',
+  theory:`
+    <h4>1. Модель дегеніміз не?</h4>
+    <p><b>Модель</b> — нақты объектінің немесе процестің жеңілдетілген ұқсастығы. Модель зерттелетін нысанның ең маңызды қасиеттерін ғана сақтайды.</p>
+    <h4>2. Модельдеу ұғымы</h4>
+    <p><b>Модельдеу</b> — модель құру және оны зерттеу процесі. Модельдеу арқылы қымбат, қауіпті немесе ұзақ тәжірибелерді компьютерде жылдам әрі қауіпсіз жүргізуге болады.</p>
+    <h4>3. Электрондық кестеде процесті модельдеу</h4>
+    <p>Электрондық кестеде модельдеу үшін:</p>
+    <ol>
+      <li>Процестің <b>бастапқы деректерін</b> белгілейміз.</li>
+      <li>Олардың арасындағы байланысты <b>формулалар</b> түрінде жазамыз.</li>
+      <li>Нәтижені есептейміз.</li>
+      <li>Бастапқы деректерді өзгертіп, нәтиженің қалай өзгеретінін бақылаймыз.</li>
+    </ol>
+    <h4>4. Бастапқы деректер</h4>
+    <p><b>Бастапқы деректер</b> — модельге кіретін мәндер. Мысалы, дүкен есебінде: тауар бағасы және саны.</p>
+    <h4>5. Формулалар мен есептеу нәтижелері</h4>
+    <p>Формула бастапқы деректерді байланыстырады. Мысалы: <b>=B2*C2</b> — бағаны санына көбейтіп, жалпы құнды береді. Бастапқы дерек өзгерсе, нәтиже автоматты қайта есептеледі.</p>
+    <h4>6. Айнымалы мәндер</h4>
+    <p><b>Айнымалы мән</b> — өзгертілуі мүмкін бастапқы дерек. Оны өзгерту арқылы «егер… болса, не болады?» деген сұраққа жауап алуға болады.</p>
+    <h4>7. Нәтижелерді салыстыру</h4>
+    <p>Әртүрлі айнымалы мәндермен бірнеше есептеу жүргізіп, нәтижелерді салыстыруға болады. Мысалы, тауар бағасы 10%-ға артса, жалпы шығын қаншаға өседі?</p>
+    <h4>8. Күнделікті өмірдегі модельдеу мысалдары</h4>
+    <ul>
+      <li>Отбасылық бюджет: кіріс пен шығысты есептеу.</li>
+      <li>Дүкендегі сатып алу: жалпы құнды есептеу.</li>
+      <li>Бірнеше күндегі температураның өзгеруін бақылау.</li>
+      <li>Ұялы телефон тарифін таңдау.</li>
+      <li>Спорт жаттығуының жоспарын құру.</li>
+    </ul>
+  `,
+  examples:`
+    <p><b>Мысал: «Отбасылық бюджет» моделі.</b></p>
+    <table class="demo">
+      <tr><th>Ұяшық</th><th>Көрсеткіш</th><th>Мән / формула</th></tr>
+      <tr><td>B1</td><td>Айлық кіріс</td><td>250 000</td></tr>
+      <tr><td>B2</td><td>Тамақ шығыны</td><td>80 000</td></tr>
+      <tr><td>B3</td><td>Көлік шығыны</td><td>25 000</td></tr>
+      <tr><td>B4</td><td>Басқа шығындар</td><td>45 000</td></tr>
+      <tr><td>B5</td><td>Жалпы шығын</td><td>=SUM(B2:B4)</td></tr>
+      <tr><td>B6</td><td>Қалдық</td><td>=B1-B5</td></tr>
+    </table>
+    <p>Енді B2 ұяшығындағы тамақ шығынын 90 000-ға өзгертсек, B5 және B6 ұяшықтарындағы мәндер <b>автоматты түрде</b> қайта есептеледі. Осылайша модель «тірі» болады.</p>
+  `,
+  remember:'Модель — нақты объектінің жеңілдетілген ұқсастығы. Электрондық кестеде модель бастапқы деректер мен формулалардан тұрады. Бастапқы деректі өзгертсең, нәтиже автоматты қайта есептеледі.',
+  tasks:[
+    {
+      title:'1-тапсырма. Дүкен есебі',
+      desc:'Төмендегі кестеге тауар санын және бағасын енгіз — жалпы құн автоматты есептеледі. Содан кейін сұрақтарға <b>жазбаша</b> жауап бер.',
+      html:`
+        <div data-widget="shop">
+          <div class="sheetwrap">
+            <table class="sheet">
+              <tr><th></th><th>A</th><th>B</th><th>C</th><th>D</th></tr>
+              <tr><th>1</th><td class="calc" style="text-align:left">Тауар</td><td class="calc" style="text-align:left">Саны</td><td class="calc" style="text-align:left">Бағасы</td><td class="calc" style="text-align:left">Жалпы құн</td></tr>
+              <tr><th>2</th><td class="calc" style="text-align:left">Дәптер</td><td><input class="cellin shop-q" type="number" value="10"></td><td><input class="cellin shop-p" type="number" value="250"></td><td class="calc shop-r">0</td></tr>
+              <tr><th>3</th><td class="calc" style="text-align:left">Қалам</td><td><input class="cellin shop-q" type="number" value="5"></td><td><input class="cellin shop-p" type="number" value="120"></td><td class="calc shop-r">0</td></tr>
+              <tr><th>4</th><td class="calc" style="text-align:left">Өшіргіш</td><td><input class="cellin shop-q" type="number" value="4"></td><td><input class="cellin shop-p" type="number" value="80"></td><td class="calc shop-r">0</td></tr>
+              <tr><th>5</th><td class="calc" style="text-align:left">БАРЛЫҒЫ</td><td class="calc">—</td><td class="calc">—</td><td class="calc shop-total">0</td></tr>
+            </table>
+          </div>
+        </div>`,
+      fields:[
+        {label:'Дәптердің жалпы құны (D2) нешеге тең?', a:()=>[String(shopRows()[0])]},
+        {label:'Барлық тауардың жалпы сомасы (D5) нешеге тең?', a:()=>[String(shopTotal())]},
+        {label:'D2 ұяшығында қандай формула болуы керек?', a:['=b2*c2','=b2*c2','b2*c2','=c2*b2']},
+        {label:'D5 ұяшығында қандай формула болуы керек?', a:['=sum(d2:d4)','=сумм(d2:d4)','=d2+d3+d4']}
+      ]
+    },
+    {
+      title:'2-тапсырма. Өзгерісті зертте',
+      desc:'Дүкен есебіндегі бағаларды өзгертіп, нәтиженің қалай өзгеретінін бақыла. Содан кейін сұрақтарға <b>жазбаша</b> жауап бер.',
+      fields:[
+        {label:'Егер дәптер бағасы 250-ден 300-ге өссе, дәптердің жалпы құны қаншаға артады? (10 дана)', a:['500']},
+        {label:'Егер қаламның саны 5-тен 10-ға өссе, қаламның жалпы құны нешеге тең болады? (бағасы 120)', a:['1200']},
+        {label:'Модельде өзгертілуі мүмкін бастапқы дерек қалай аталады?', a:['айнымалы','айнымалы мән','айнымалы шама']},
+        {label:'Бастапқы дерек өзгергенде нәтиже қалай есептеледі?', a:['автоматты','автоматты түрде','қайта есептеледі','автоматты қайта есептеледі']}
+      ]
+    }
+  ],
+  test:[
+    q('Модель дегеніміз не?', ['Нақты объектінің жеңілдетілген ұқсастығы','Нақты объектінің өзі','Сурет','Мәтін'], 0),
+    q('Модельдеу дегеніміз не?', ['Сурет салу','Модель құру және оны зерттеу процесі','Мәтін теру','Ойын ойнау'], 1),
+    q('Электрондық кестеде модельдеу үшін не қажет?', ['Тек суреттер','Тек мәтін','Тек түстер','Бастапқы деректер мен формулалар'], 3),
+    q('Отбасылық бюджет моделінде бастапқы деректер:', ['Ауа райы','Кіріс пен шығыс сомалары','Музыка','Суреттер'], 1),
+    q('Бастапқы мәнді өзгерткенде нәтиже:', ['Өзгермейді','Өшіріледі','Автоматты қайта есептеледі','Қате береді'], 2),
+    q('Модельдеудің артықшылығы:', ['Қағаз үнемдеу','Тәжірибені қауіпсіз және жылдам жүргізу','Интернет жылдамдығы','Ойын'], 1),
+    q('Формула дегеніміз не?', ['Мәтін','Сурет','Есептеу ережесін сипаттайтын өрнек','Тақырып'], 2),
+    q('Дүкен есебінде жалпы құн қалай табылады?', ['Баға + саны','Баға − саны','Баға ÷ саны','Баға × саны'], 3),
+    q('«Айнымалы мән» дегеніміз не?', ['Өзгертілуі мүмкін бастапқы дерек','Тұрақты сан','Формула','Ұяшық түсі'], 0),
+    q('Күнделікті өмірдегі модельдеу мысалы:', ['Ән тыңдау','Сурет салу','Кітап оқу','Температура өзгерісін графикпен көрсету'], 3)
+  ]
+}
+];
+
+/* ============================================================
+   4. ПРАКТИКАЛЫҚ ЗЕРТХАНА
+   ============================================================ */
+const PRACTICE = [
+{
+  id:'p1', icon:'🗓️', title:'Сыныптың сабақ кестесі',
+  goal:'Кесте құру және форматтау дағдыларын бекіту.',
+  data:'Дүйсенбі: Математика, Қазақ тілі, Информатика. Сейсенбі: Тарих, Ағылшын тілі, Физика.',
+  steps:['Кестеге 4 баған (Күн + 3 сабақ) және 3 жол құр.','Тақырып жолын толтыр.','Әр күннің сабақтарын жаз.','Тақырып жолын қалың қаріппен белгіле.'],
+  html:`
+    <div class="sheetwrap">
+      <table class="sheet">
+        <tr><th></th><th>A</th><th>B</th><th>C</th><th>D</th></tr>
+        <tr><th>1</th><td class="calc" style="text-align:left">Күн</td><td class="calc" style="text-align:left">1-сабақ</td><td class="calc" style="text-align:left">2-сабақ</td><td class="calc" style="text-align:left">3-сабақ</td></tr>
+        <tr><th>2</th><td class="calc" style="text-align:left">Дүйсенбі</td><td><input class="cellin" data-f="0"></td><td><input class="cellin" data-f="1"></td><td><input class="cellin" data-f="2"></td></tr>
+        <tr><th>3</th><td class="calc" style="text-align:left">Сейсенбі</td><td><input class="cellin" data-f="3"></td><td><input class="cellin" data-f="4"></td><td><input class="cellin" data-f="5"></td></tr>
+      </table>
+    </div>`,
+  fields:[
+    {label:'B2', a:['математика']},
+    {label:'C2', a:['қазақ тілі']},
+    {label:'D2', a:['информатика']},
+    {label:'B3', a:['тарих']},
+    {label:'C3', a:['ағылшын тілі','ағылшын']},
+    {label:'D3', a:['физика']}
+  ],
+  criteria:'6 ұяшықтың барлығы дұрыс толтырылса — «Өте жақсы», 4–5 дұрыс — «Жақсы», 3 және одан аз — «Қайталап көр».'
+},
+{
+  id:'p2', icon:'🛒', title:'Дүкендегі сатып алу',
+  goal:'Формуламен жалпы соманы есептеу.',
+  data:'Алма — 3 кг × 450 тг; Банан — 2 кг × 700 тг; Жүзім — 1 кг × 1200 тг.',
+  steps:['Саны мен бағасын енгіз.','Әр жолдың жалпы құнын формуламен есепте (D = B × C).','Барлық соманы SUM арқылы тап.'],
+  html:`
+    <div data-widget="shop">
+      <div class="sheetwrap">
+        <table class="sheet">
+          <tr><th></th><th>A</th><th>B</th><th>C</th><th>D</th></tr>
+          <tr><th>1</th><td class="calc" style="text-align:left">Тауар</td><td class="calc" style="text-align:left">Саны</td><td class="calc" style="text-align:left">Бағасы</td><td class="calc" style="text-align:left">Жалпы</td></tr>
+          <tr><th>2</th><td class="calc" style="text-align:left">Алма</td><td><input class="cellin shop-q" type="number" value="3"></td><td><input class="cellin shop-p" type="number" value="450"></td><td class="calc shop-r">0</td></tr>
+          <tr><th>3</th><td class="calc" style="text-align:left">Банан</td><td><input class="cellin shop-q" type="number" value="2"></td><td><input class="cellin shop-p" type="number" value="700"></td><td class="calc shop-r">0</td></tr>
+          <tr><th>4</th><td class="calc" style="text-align:left">Жүзім</td><td><input class="cellin shop-q" type="number" value="1"></td><td><input class="cellin shop-p" type="number" value="1200"></td><td class="calc shop-r">0</td></tr>
+          <tr><th>5</th><td class="calc" style="text-align:left">БАРЛЫҒЫ</td><td class="calc">—</td><td class="calc">—</td><td class="calc shop-total">0</td></tr>
+        </table>
+      </div>
+    </div>`,
+  fields:[
+    {label:'Алманың жалпы құны', a:()=>[String(shopRows()[0])]},
+    {label:'Бананның жалпы құны', a:()=>[String(shopRows()[1])]},
+    {label:'Жүзімнің жалпы құны', a:()=>[String(shopRows()[2])]},
+    {label:'Барлық сома', a:()=>[String(shopTotal())]}
+  ],
+  criteria:'Барлық төрт жауап дұрыс болса — тапсырма орындалды.'
+},
+{
+  id:'p3', icon:'💸', title:'Апталық шығын',
+  goal:'Деректерді енгізу және талдау (қосынды, орташа, максимум).',
+  data:'Дүйсенбі — 450, Сейсенбі — 300, Сәрсенбі — 600, Бейсенбі — 250, Жұма — 400 теңге.',
+  steps:['Шығындарды енгіз.','Қосындыны тап.','Орташа мәнді тап.','Ең үлкен мәнді анықта.'],
+  html:`
+    <div data-widget="week">
+      <div class="sheetwrap">
+        <table class="sheet">
+          <tr><th></th><th>A</th><th>B</th></tr>
+          <tr><th>1</th><td class="calc" style="text-align:left">Күн</td><td class="calc" style="text-align:left">Шығын</td></tr>
+          <tr><th>2</th><td class="calc" style="text-align:left">Дүйсенбі</td><td><input class="cellin week-in" type="number" value="450"></td></tr>
+          <tr><th>3</th><td class="calc" style="text-align:left">Сейсенбі</td><td><input class="cellin week-in" type="number" value="300"></td></tr>
+          <tr><th>4</th><td class="calc" style="text-align:left">Сәрсенбі</td><td><input class="cellin week-in" type="number" value="600"></td></tr>
+          <tr><th>5</th><td class="calc" style="text-align:left">Бейсенбі</td><td><input class="cellin week-in" type="number" value="250"></td></tr>
+          <tr><th>6</th><td class="calc" style="text-align:left">Жұма</td><td><input class="cellin week-in" type="number" value="400"></td></tr>
+          <tr><th>7</th><td class="calc" style="text-align:left">Қосынды</td><td class="calc week-sum">0</td></tr>
+        </table>
+      </div>
+    </div>`,
+  fields:[
+    {label:'Апталық қосынды шығын', a:()=>[String(weekSum())]},
+    {label:'Орташа күндік шығын (бүтін санға дейін)', a:()=>[String(Math.round(weekSum()/5))]},
+    {label:'Ең үлкен шығын қай күні болды?', a:()=>[weekMaxDay()]},
+    {label:'Ең үлкен шығын мөлшері', a:()=>[String(Math.max(...weekVals()))]}
+  ],
+  criteria:'Қосынды, орташа және максимум дұрыс табылса — тапсырма орындалды.'
+},
+{
+  id:'p4', icon:'🚦', title:'Бағалар кестесі',
+  goal:'Шартты форматтауды қолдану.',
+  data:'Бағалар: 5, 4, 3, 5, 2. Шарт: 5 — жасыл, 4 — көгілдір, 3 — сары, 2 — қызыл.',
+  steps:['Кестедегі бағаларды қара.','Әр бағаға сәйкес түсті анықта.','Шартты жазбаша көрсет.'],
+  html:`
+    <div class="sheetwrap">
+      <table class="sheet">
+        <tr><th></th><th>A</th><th>B</th></tr>
+        <tr><th>1</th><td class="calc" style="text-align:left">Оқушы</td><td class="calc" style="text-align:left">Баға</td></tr>
+        <tr><th>2</th><td class="calc" style="text-align:left">Дамир</td><td class="calc" style="background:#DFF5E7;color:#186B47;font-weight:700">5</td></tr>
+        <tr><th>3</th><td class="calc" style="text-align:left">Айша</td><td class="calc" style="background:#E4F7FA;color:#1C7C8C;font-weight:700">4</td></tr>
+        <tr><th>4</th><td class="calc" style="text-align:left">Ерлан</td><td class="calc" style="background:#FFF3CF;color:#8A6A00;font-weight:700">3</td></tr>
+        <tr><th>5</th><td class="calc" style="text-align:left">Мирас</td><td class="calc" style="background:#FFE2DD;color:#B33A2A;font-weight:700">2</td></tr>
+        <tr><th>6</th><td class="calc" style="text-align:left">Ая</td><td class="calc" style="background:#DFF5E7;color:#186B47;font-weight:700">5</td></tr>
+      </table>
+    </div>`,
+  fields:[
+    {label:'5 бағасы бар ұяшықтарды үтір арқылы жаз', a:['b2, b6','b2,b6','b2 b6','b2; b6']},
+    {label:'2 бағасы бар ұяшықтың мекенжайы', a:['b5']},
+    {label:'Ең көп кездесетін баға', a:['5']},
+    {label:'«5-ке тең» деген шарт қалай жазылады?', a:['=5','5']}
+  ],
+  criteria:'Барлық жауап дұрыс болса — шартты форматтауды меңгердің.'
+},
+{
+  id:'p5', icon:'📊', title:'Сүйікті пәндер',
+  goal:'Диаграмма құру және талдау.',
+  data:'Информатика — 9, Математика — 6, Тарих — 3, Ағылшын тілі — 2 оқушы.',
+  steps:['Деректерді енгіз.','Диаграмманы құр.','Ең үлкен мәнді анықта.','Үлесті есепте.'],
+  html:`
+    <div data-widget="chart">
+      <div class="sheetwrap" style="margin-bottom:12px">
+        <table class="sheet">
+          <tr><th></th><th>A</th><th>B</th></tr>
+          <tr><th>1</th><td class="calc" style="text-align:left">Пән</td><td class="calc" style="text-align:left">Оқушы саны</td></tr>
+          <tr><th>2</th><td class="calc" style="text-align:left">Информатика</td><td><input class="cellin chart-in" type="number" value="9" data-k="Информатика"></td></tr>
+          <tr><th>3</th><td class="calc" style="text-align:left">Математика</td><td><input class="cellin chart-in" type="number" value="6" data-k="Математика"></td></tr>
+          <tr><th>4</th><td class="calc" style="text-align:left">Тарих</td><td><input class="cellin chart-in" type="number" value="3" data-k="Тарих"></td></tr>
+          <tr><th>5</th><td class="calc" style="text-align:left">Ағылшын тілі</td><td><input class="cellin chart-in" type="number" value="2" data-k="Ағылшын тілі"></td></tr>
+        </table>
+      </div>
+      <div class="chart-out"></div>
+    </div>`,
+  fields:[
+    {label:'Ең көп таңдалған пән', a:()=>[chartMaxKey()]},
+    {label:'Барлық оқушы саны', a:()=>[String(chartSum())]},
+    {label:'Информатиканы таңдаған оқушылардың үлесі (пайызбен, бүтін)', a:()=>[String(Math.round(chartVals()[0]/chartSum()*100))]},
+    {label:'Осындай деректерді көрсетуге қай диаграмма түрі қолайлы?', a:['бағандық','дөңгелек','бағандық немесе дөңгелек','бағандық, дөңгелек']}
+  ],
+  criteria:'Диаграмма дұрыс құрылып, есептеулер дәл болса — тапсырма орындалды.'
+},
+{
+  id:'p6', icon:'🌡️', title:'Температураны бақылау',
+  goal:'Деректерді графикпен көрсету.',
+  data:'Таңғы 6:00 — 8°C, 9:00 — 12°C, 12:00 — 18°C, 15:00 — 20°C, 18:00 — 15°C, 21:00 — 10°C.',
+  steps:['Деректерді кестеге енгіз.','Сызықтық диаграмма құр.','Ең жоғары және ең төмен температураны анықта.'],
+  html:`
+    <div data-widget="temp">
+      <div class="sheetwrap" style="margin-bottom:12px">
+        <table class="sheet">
+          <tr><th></th><th>A</th><th>B</th></tr>
+          <tr><th>1</th><td class="calc" style="text-align:left">Уақыт</td><td class="calc" style="text-align:left">Температура</td></tr>
+          <tr><th>2</th><td class="calc" style="text-align:left">6:00</td><td><input class="cellin temp-in" type="number" value="8" data-k="6:00"></td></tr>
+          <tr><th>3</th><td class="calc" style="text-align:left">9:00</td><td><input class="cellin temp-in" type="number" value="12" data-k="9:00"></td></tr>
+          <tr><th>4</th><td class="calc" style="text-align:left">12:00</td><td><input class="cellin temp-in" type="number" value="18" data-k="12:00"></td></tr>
+          <tr><th>5</th><td class="calc" style="text-align:left">15:00</td><td><input class="cellin temp-in" type="number" value="20" data-k="15:00"></td></tr>
+          <tr><th>6</th><td class="calc" style="text-align:left">18:00</td><td><input class="cellin temp-in" type="number" value="15" data-k="18:00"></td></tr>
+          <tr><th>7</th><td class="calc" style="text-align:left">21:00</td><td><input class="cellin temp-in" type="number" value="10" data-k="21:00"></td></tr>
+        </table>
+      </div>
+      <div class="chart-out"></div>
+    </div>`,
+  fields:[
+    {label:'Ең жоғары температура неше градус?', a:()=>[String(Math.max(...tempVals()))]},
+    {label:'Ең жоғары температура қай уақытта болды?', a:()=>[tempMaxTime()]},
+    {label:'Ең төмен температура неше градус?', a:()=>[String(Math.min(...tempVals()))]},
+    {label:'Орташа температура (бүтін санға дейін)', a:()=>[String(Math.round(tempVals().reduce((a,b)=>a+b,0)/tempVals().length))]}
+  ],
+  criteria:'График дұрыс құрылып, максимум мен минимум дұрыс табылса — тапсырма орындалды.'
+},
+{
+  id:'p7', icon:'🏠', title:'Отбасылық бюджет',
+  goal:'Электрондық кестеде қарапайым модель құру.',
+  data:'Кіріс — 250 000 тг; Тамақ — 80 000; Көлік — 25 000; Басқа — 45 000.',
+  steps:['Кірісті енгіз.','Шығындарды енгіз.','Жалпы шығынды формуламен тап.','Қалдықты формуламен тап.'],
+  html:`
+    <div data-widget="budget">
+      <div class="sheetwrap">
+        <table class="sheet">
+          <tr><th></th><th>A</th><th>B</th></tr>
+          <tr><th>1</th><td class="calc" style="text-align:left">Көрсеткіш</td><td class="calc" style="text-align:left">Сома</td></tr>
+          <tr><th>2</th><td class="calc" style="text-align:left">Кіріс</td><td><input class="cellin bud-in" type="number" value="250000"></td></tr>
+          <tr><th>3</th><td class="calc" style="text-align:left">Тамақ</td><td><input class="cellin bud-in" type="number" value="80000"></td></tr>
+          <tr><th>4</th><td class="calc" style="text-align:left">Көлік</td><td><input class="cellin bud-in" type="number" value="25000"></td></tr>
+          <tr><th>5</th><td class="calc" style="text-align:left">Басқа</td><td><input class="cellin bud-in" type="number" value="45000"></td></tr>
+          <tr><th>6</th><td class="calc" style="text-align:left">Жалпы шығын</td><td class="calc bud-out">0</td></tr>
+          <tr><th>7</th><td class="calc" style="text-align:left">Қалдық</td><td class="calc bud-rest">0</td></tr>
+        </table>
+      </div>
+    </div>`,
+  fields:[
+    {label:'Жалпы шығын нешеге тең?', a:()=>[String(budOut())]},
+    {label:'Қалдық нешеге тең?', a:()=>[String(budRest())]},
+    {label:'Жалпы шығынды табатын формуланы жаз', a:['=sum(b3:b5)','=сумм(b3:b5)','=b3+b4+b5']},
+    {label:'Қалдықты табатын формуланы жаз', a:['=b2-b6','=b2 - b6']},
+    {label:'Тамақ шығынын 90 000-ға өзгертсе, қалдық нешеге тең болады?', a:['10000','10 000']}
+  ],
+  criteria:'Барлық бес жауап дұрыс болса — модельді құруды меңгердің.'
+}
+];
+
+/* ============================================================
+   5. ҚОРЫТЫНДЫ ТЕСТ (30 сұрақ)
+   ============================================================ */
+const FINAL_TEST = [
+  q('Кестедегі жол мен бағанның қиылысы қалай аталады?', ['Баған','Ұяшық','Жол','Блок'], 1),
+  q('Электрондық кесте редакторына мысал келтір:', ['Microsoft Word','Paint','Блокнот','Google Sheets'], 3),
+  q('Ұяшық мекенжайы қалай жазылады?', ['3B','B-3','B3','3-B'], 2),
+  q('Формула қандай таңбадан басталады?', ['+','=','#','@'], 1),
+  q('«Дамир» мәні қандай деректер типіне жатады?', ['Сан','Күн','Логикалық','Мәтін'], 3),
+  q('15:30 мәні қандай деректер типіне жатады?', ['Уақыт','Күн','Мәтін','Сан'], 0),
+  q('Логикалық типтің мәндері:', ['0 мен 1','ИӘ және ЖОҚ (TRUE/FALSE)','А және B','+ және −'], 1),
+  q('Қалың қаріп қою пернелер тіркесі:', ['Ctrl+C','Ctrl+B','Ctrl+V','Ctrl+S'], 1),
+  q('Курсив пернелер тіркесі:', ['Ctrl+I','Ctrl+B','Ctrl+U','Ctrl+Z'], 0),
+  q('Мәтінді ұяшықтың ортасына орналастыру қалай аталады?', ['Біріктіру','Сүзу','Туралау','Сұрыптау'], 2),
+  q('Форматтау деректердің мәнін өзгерте ме?', ['Иә','Жоқ, тек сыртқы түрін өзгертеді','Кейде','Тек формуланы'], 1),
+  q('Шартты форматтау дегеніміз не?', ['Барлық ұяшықты бояу','Белгілі бір шартқа сәйкес ұяшықтарды автоматты пішімдеу','Деректерді өшіру','Кестені көшіру'], 1),
+  q('«Баға > 4» шарты бойынша қандай ұяшықтар боялады?', ['4-тен үлкен мәндер','4-тен кіші мәндер','4-ке тең мәндер','Барлық мәндер'], 0),
+  q('Қайталанатын мәндерді ерекшелеу үшін қандай ереже қолданылады?', ['Мәтін бар','Күн','Жоғарғы 10','Қайталанатын мәндер'], 3),
+  q('Температураның уақыт бойынша өзгеруін көрсету үшін қандай диаграмма ыңғайлы?', ['Дөңгелек','Сызықтық','Бағандық','Торлы'], 1),
+  q('Дөңгелек диаграммада барлық секторлардың қосындысы неге тең?', ['50%','10%','100%','1000'], 2),
+  q('Диаграмма қай деректерге сүйенеді?', ['Суретке','Мәтінге','Кестедегі нақты мәндерге','Түске'], 2),
+  q('Модель дегеніміз не?', ['Нақты объектінің жеңілдетілген ұқсастығы','Нақты объектінің өзі','Сурет','Мәтін'], 0),
+  q('Дүкен есебінде жалпы құн қалай табылады?', ['Баға + саны','Баға × саны','Баға − саны','Баға ÷ саны'], 1),
+  q('Бастапқы мәнді өзгерткенде нәтиже:', ['Өзгермейді','Өшіріледі','Автоматты қайта есептеледі','Қате береді'], 2),
+  q('Кестеге жаңа баған қосу үшін не істеу керек?', ['Ұяшықты таңдап, «Солға баған қосу» командасын беру','Мәтінді өшіру','Қаріпті өзгерту','Бетті бұру'], 0),
+  q('A1:A5 аралығының қосындысын табатын функция:', ['=СРЗНАЧ(A1:A5)','=SUM(A1:A5)','=MAX(A1:A5)','=MIN(A1:A5)'], 1),
+  q('Жұмыс парағының бағандары қалай белгіленеді?', ['1, 2, 3 сандарымен','A, B, C әріптерімен','Рим сандарымен','Түстермен'], 1),
+  q('Мәтін енгізгенде ұяшықта әдетте қай жаққа тураланады?', ['Оңға','Ортаға','Солға','Төменге'], 2),
+  q('Сан енгізгенде ұяшықта әдетте қай жаққа тураланады?', ['Оңға','Солға','Ортаға','Жоғарыға'], 0),
+  q('Ұяшық шекарасы не үшін қажет?', ['Сандарды қосу үшін','Ұяшықтарды бөліп көрсету үшін','Мәтінді өшіру үшін','Формула жазу үшін'], 1),
+  q('«5-ке тең» бағаларды бөліп көрсету шарты:', ['>5','<5','=5','>=5'], 2),
+  q('Сыныптағы сүйікті пәндердің үлесін көрсету үшін қандай диаграмма қолайлы?', ['Дөңгелек','Сызықтық','Торлы','Нүктелік'], 0),
+  q('Кесте тақырыбын жазу үшін қандай команда жиі қолданылады?', ['Жолды жою','Ұяшықтарды біріктіру','Сүзу','Сұрыптау'], 1),
+  q('Электрондық кестенің басты артықшылығы:', ['Сурет салу','Бастапқы дерек өзгергенде нәтиженің автоматты қайта есептелуі','Музыка ойнату','Мәтінді теру'], 1)
+];
+
+/* ============================================================
+   6. ВИДЖЕТТЕР
+   ============================================================ */
+function currentSum(){
+  const w = $('[data-widget="sum"]');
+  if(!w) return 0;
+  return $$('.sum-in', w).reduce((s,i)=> s + (parseFloat(i.value)||0), 0);
+}
+function shopRows(){
+  const w = $('[data-widget="shop"]');
+  if(!w) return [0,0,0];
+  const qs = $$('.shop-q', w).map(i=>parseFloat(i.value)||0);
+  const ps = $$('.shop-p', w).map(i=>parseFloat(i.value)||0);
+  return qs.map((q,i)=> q*ps[i]);
+}
+function shopTotal(){ return shopRows().reduce((a,b)=>a+b,0); }
+function weekVals(){
+  const w = $('[data-widget="week"]');
+  if(!w) return [0];
+  return $$('.week-in', w).map(i=>parseFloat(i.value)||0);
+}
+function weekSum(){ return weekVals().reduce((a,b)=>a+b,0); }
+const WEEK_DAYS = ['Дүйсенбі','Сейсенбі','Сәрсенбі','Бейсенбі','Жұма'];
+function weekMaxDay(){
+  const v = weekVals();
+  let mi = 0;
+  v.forEach((x,i)=>{ if(x > v[mi]) mi = i; });
+  return WEEK_DAYS[mi] || '';
+}
+function chartVals(){
+  const w = $('[data-widget="chart"]');
+  if(!w) return [0];
+  return $$('.chart-in', w).map(i=>parseFloat(i.value)||0);
+}
+function chartKeys(){
+  const w = $('[data-widget="chart"]');
+  if(!w) return [''];
+  return $$('.chart-in', w).map(i=>i.dataset.k || '');
+}
+function chartSum(){ return chartVals().reduce((a,b)=>a+b,0); }
+function chartMaxIdx(){
+  const v = chartVals(); let mi = 0;
+  v.forEach((x,i)=>{ if(x > v[mi]) mi = i; });
+  return mi;
+}
+function chartMaxKey(){ return chartKeys()[chartMaxIdx()] || ''; }
+function chartMaxVal(){ return chartVals()[chartMaxIdx()] || 0; }
+function tempVals(){
+  const w = $('[data-widget="temp"]');
+  if(!w) return [0];
+  return $$('.temp-in', w).map(i=>parseFloat(i.value)||0);
+}
+function tempKeys(){
+  const w = $('[data-widget="temp"]');
+  if(!w) return [''];
+  return $$('.temp-in', w).map(i=>i.dataset.k || '');
+}
+function tempMaxTime(){
+  const v = tempVals(); let mi = 0;
+  v.forEach((x,i)=>{ if(x > v[mi]) mi = i; });
+  return tempKeys()[mi] || '';
+}
+function budVals(){
+  const w = $('[data-widget="budget"]');
+  if(!w) return [0,0,0,0];
+  return $$('.bud-in', w).map(i=>parseFloat(i.value)||0);
+}
+function budOut(){ const v = budVals(); return v[1]+v[2]+v[3]; }
+function budRest(){ const v = budVals(); return v[0] - (v[1]+v[2]+v[3]); }
+
+/* SVG диаграммалар */
+function barSVG(data){
+  const w = 460, h = 220, pad = 34, base = h - 34;
+  const max = Math.max(...data.map(d=>d.v), 1);
+  const step = (w - pad - 20) / data.length;
+  const bw = Math.min(58, step - 18);
+  let s = '';
+  data.forEach((d,i)=>{
+    const x = pad + i*step + (step-bw)/2;
+    const bh = Math.max(2, (d.v/max) * (base - 26));
+    const y = base - bh;
+    s += '<rect x="'+x+'" y="'+y+'" width="'+bw+'" height="'+bh+'" rx="7" fill="'+(d.c||'#2E8B62')+'"/>';
+    s += '<text x="'+(x+bw/2)+'" y="'+(y-7)+'" text-anchor="middle" font-size="12" font-weight="700" fill="#1F2A24">'+d.v+'</text>';
+    s += '<text x="'+(x+bw/2)+'" y="'+(h-12)+'" text-anchor="middle" font-size="11" fill="#6B7A72">'+esc(d.k)+'</text>';
+  });
+  s += '<line x1="'+pad+'" y1="'+base+'" x2="'+(w-10)+'" y2="'+base+'" stroke="#E6E2DA" stroke-width="2"/>';
+  return '<svg viewBox="0 0 '+w+' '+h+'" class="chart">'+s+'</svg>';
+}
+function lineSVG(data){
+  const w = 460, h = 220, pad = 38, base = h - 34;
+  const vals = data.map(d=>d.v);
+  const max = Math.max(...vals, 1), min = Math.min(...vals, 0);
+  const range = (max - min) || 1;
+  const step = (w - pad - 20) / Math.max(data.length - 1, 1);
+  const pts = data.map((d,i)=>{
+    const x = pad + i*step;
+    const y = base - ((d.v - min)/range) * (base - 34);
+    return [x, y, d.v, d.k];
+  });
+  let s = '';
+  s += '<polyline points="'+pts.map(p=>p[0]+','+p[1]).join(' ')+'" fill="none" stroke="#FF6B5B" stroke-width="3" stroke-linejoin="round"/>';
+  pts.forEach(p=>{
+    s += '<circle cx="'+p[0]+'" cy="'+p[1]+'" r="5" fill="#fff" stroke="#FF6B5B" stroke-width="3"/>';
+    s += '<text x="'+p[0]+'" y="'+(p[1]-12)+'" text-anchor="middle" font-size="12" font-weight="700" fill="#1F2A24">'+p[2]+'</text>';
+    s += '<text x="'+p[0]+'" y="'+(h-12)+'" text-anchor="middle" font-size="11" fill="#6B7A72">'+esc(p[3])+'</text>';
+  });
+  s += '<line x1="'+pad+'" y1="'+base+'" x2="'+(w-10)+'" y2="'+base+'" stroke="#E6E2DA" stroke-width="2"/>';
+  return '<svg viewBox="0 0 '+w+' '+h+'" class="chart">'+s+'</svg>';
+}
+
+/* Виджеттерді іске қосу */
+function initWidgets(root){
+  /* sum */
+  const sw = $('[data-widget="sum"]', root);
+  if(sw){
+    const upd = ()=>{ $('.sum-out', sw).textContent = currentSum(); };
+    $$('.sum-in', sw).forEach(i=>i.addEventListener('input', upd));
+    upd();
+  }
+  /* shop */
+  const shw = $('[data-widget="shop"]', root);
+  if(shw){
+    const upd = ()=>{
+      const rows = shopRows();
+      $$('.shop-r', shw).forEach((td,i)=>{ td.textContent = rows[i]; });
+      $('.shop-total', shw).textContent = shopTotal();
+    };
+    $$('.shop-q, .shop-p', shw).forEach(i=>i.addEventListener('input', upd));
+    upd();
+  }
+  /* week */
+  const ww = $('[data-widget="week"]', root);
+  if(ww){
+    const upd = ()=>{ $('.week-sum', ww).textContent = weekSum(); };
+    $$('.week-in', ww).forEach(i=>i.addEventListener('input', upd));
+    upd();
+  }
+  /* chart */
+  const cw = $('[data-widget="chart"]', root);
+  if(cw){
+    const upd = ()=>{
+      const data = chartVals().map((v,i)=>({k:chartKeys()[i], v:v, c:'#2E8B62'}));
+      $('.chart-out', cw).innerHTML = barSVG(data);
+    };
+    $$('.chart-in', cw).forEach(i=>i.addEventListener('input', upd));
+    upd();
+  }
+  /* temp */
+  const tw = $('[data-widget="temp"]', root);
+  if(tw){
+    const upd = ()=>{
+      const data = tempVals().map((v,i)=>({k:tempKeys()[i], v:v}));
+      $('.chart-out', tw).innerHTML = lineSVG(data);
+    };
+    $$('.temp-in', tw).forEach(i=>i.addEventListener('input', upd));
+    upd();
+  }
+  /* budget */
+  const bw = $('[data-widget="budget"]', root);
+  if(bw){
+    const upd = ()=>{
+      $('.bud-out', bw).textContent = budOut();
+      $('.bud-rest', bw).textContent = budRest();
+    };
+    $$('.bud-in', bw).forEach(i=>i.addEventListener('input', upd));
+    upd();
+  }
+}
+
+/* ============================================================
+   7. ТАПСЫРМАЛАРДЫ ТЕКСЕРУ
+   ============================================================ */
+function taskBlock(task, idx){
+  const hasHtmlInputs = task.html && task.html.indexOf('data-f=') !== -1;
+  let h = '<div class="task" data-task="'+idx+'">';
+  h += '<h4>'+task.title+'</h4>';
+  h += '<p>'+task.desc+'</p>';
+  if(task.note) h += '<div class="note">'+task.note+'</div>';
+  if(task.html) h += task.html;
+  if(!hasHtmlInputs){
+    h += '<div class="fields">';
+    task.fields.forEach((f,i)=>{
+      h += '<div class="field" data-fi="'+i+'"><label>'+(i+1)+') '+f.label+'</label>'
+        + '<input type="text" data-f="'+i+'" placeholder="'+(f.ph||'жауабыңды жаз')+'">'
+        + '<span class="mark"></span></div>';
+    });
+    h += '</div>';
+  }
+  h += '<div style="margin-top:12px"><button class="btn" data-check-task>Тексеру</button> '
+     + '<button class="btn ghost sm" data-clear-task>Тазалау</button></div>';
+  h += '<div class="fb" data-task-fb style="display:none"></div>';
+  h += '</div>';
+  return h;
+}
+
+function checkTask(box, task){
+  const inputs = $$('[data-f]', box);
+  let correct = 0;
+  const details = [];
+  inputs.forEach(inp=>{
+    const i = parseInt(inp.dataset.f, 10);
+    const f = task.fields[i];
+    if(!f) return;
+    const answers = (typeof f.a === 'function') ? f.a() : f.a;
+    const val = inp.value;
+    let ok = false;
+    if(String(val).trim() !== ''){
+      ok = answers.some(a=> match(val, a));
+    }
+    if(ok) correct++;
+    details.push({label:f.label, ok:ok, val:val, ans:answers[0]});
+    /* визуал */
+    const fieldEl = inp.closest('.field');
+    if(fieldEl){
+      fieldEl.classList.toggle('ok', ok);
+      fieldEl.classList.toggle('no', !ok);
+      const m = $('.mark', fieldEl);
+      if(m) m.textContent = ok ? '✓' : '✗';
+    }else{
+      inp.style.borderColor = ok ? '#2E8B62' : '#FF6B5B';
+      inp.style.background = ok ? '#F1FAF5' : '#FFF4F2';
+    }
+  });
+  const total = task.fields.length;
+  const fb = $('[data-task-fb]', box);
+  fb.style.display = 'block';
+  const pct = Math.round(correct/total*100);
+  let cls = pct === 100 ? 'good' : (pct >= 60 ? 'good' : 'bad');
+  let msg = '';
+  if(pct === 100) msg = '🎉 Керемет! Барлық жауап дұрыс ('+correct+'/'+total+').';
+  else if(pct >= 60) msg = '👍 Жақсы! Дұрыс жауап: '+correct+'/'+total+'. Қателерді түзетіп көр.';
+  else msg = '📚 Дұрыс жауап: '+correct+'/'+total+'. Теорияны қайталап, тағы көр.';
+  let list = '';
+  details.forEach((d,i)=>{
+    if(!d.ok){
+      list += '<li>«'+esc(d.label)+'» — сенің жауабың: <b>'+(d.val?esc(d.val):'бос')+'</b>. Дұрыс жауап: <b>'+esc(d.ans)+'</b></li>';
+    }
+  });
+  fb.className = 'fb ' + cls;
+  fb.innerHTML = '<b>'+msg+'</b>' + (list ? '<ul>'+list+'</ul>' : '');
+}
+
+/* ============================================================
+   8. ТЕСТ БЛОГЫ
+   ============================================================ */
+function testBlock(questions, key, title){
+  let h = '<div class="test" data-test="'+key+'">';
+  h += '<h3>'+title+'</h3>';
+  h += '<p class="small muted">'+questions.length+' сұрақ · әр сұрақта бір дұрыс жауап</p>';
+  questions.forEach((qq,qi)=>{
+    h += '<div class="q" data-qi="'+qi+'"><p>'+(qi+1)+'. '+qq.text+'</p>';
+    qq.options.forEach((op,oi)=>{
+      h += '<label class="opt"><input type="radio" name="'+key+'-q'+qi+'" value="'+oi+'">'+op+'</label>';
+    });
+    h += '</div>';
+  });
+  h += '<div style="margin-top:14px"><button class="btn" data-check-test>Тестті тексеру</button> '
+     + '<button class="btn ghost sm" data-retry-test>Қайта тапсыру</button></div>';
+  h += '<div data-test-res></div>';
+  h += '</div>';
+  return h;
+}
+
+function checkTest(box, questions, key, onSave){
+  const resBox = $('[data-test-res]', box);
+  let correct = 0, answered = 0;
+  const wrong = [];
+  questions.forEach((qq,qi)=>{
+    const sel = $('input[name="'+key+'-q'+qi+'"]:checked', box);
+    const qEl = $('[data-qi="'+qi+'"]', box);
+    $$('.opt', qEl).forEach(o=>o.classList.remove('correct','wrong'));
+    const correctLabel = $$('.opt', qEl)[qq.correct];
+    if(correctLabel) correctLabel.classList.add('correct');
+    if(sel){
+      answered++;
+      const v = parseInt(sel.value,10);
+      if(v === qq.correct){ correct++; }
+      else {
+        const l = $$('.opt', qEl)[v];
+        if(l) l.classList.add('wrong');
+        wrong.push({n:qi+1, text:qq.text, my:qq.options[v], right:qq.options[qq.correct]});
+      }
+    }else{
+      wrong.push({n:qi+1, text:qq.text, my:'(жауап берілмеді)', right:qq.options[qq.correct]});
+    }
+  });
+  const total = questions.length;
+  const pct = Math.round(correct/total*100);
+  let grade = '';
+  if(pct >= 90) grade = 'Өте жақсы! 🏆';
+  else if(pct >= 75) grade = 'Жақсы! 👍';
+  else if(pct >= 50) grade = 'Қайталап оқы. 📖';
+  else grade = 'Теорияны қайта қарап, тағы тапсыр. 📚';
+
+  let h = '<div class="res">';
+  h += '<h4>Нәтиже</h4>';
+  h += '<p class="big">'+pct+'%</p>';
+  h += '<div class="bar"><i style="width:'+pct+'%"></i></div>';
+  h += '<p><b>Дұрыс жауап:</b> '+correct+' &nbsp;·&nbsp; <b>Қате жауап:</b> '+(total-correct)+' &nbsp;·&nbsp; <b>Жауап берілген:</b> '+answered+'/'+total+'</p>';
+  h += '<p><b>Баға:</b> '+grade+'</p>';
+  if(answered < total) h += '<p class="small">⚠️ Кейбір сұрақтарға жауап берілмеді.</p>';
+  h += '</div>';
+
+  if(wrong.length){
+    h += '<div class="res" style="background:#FFF6F4;border-color:#F7D2CB;margin-top:12px">';
+    h += '<h4 style="color:#B33A2A">Қате жауаптарды қайта қарау</h4><ul>';
+    wrong.forEach(w=>{
+      h += '<li><b>'+w.n+'-сұрақ.</b> '+esc(w.text)+'<br>Сенің жауабың: <span style="color:#B33A2A">'+esc(w.my)+'</span><br>Дұрыс жауап: <span style="color:#186B47;font-weight:700">'+esc(w.right)+'</span></li>';
+    });
+    h += '</ul></div>';
+  }
+  resBox.innerHTML = h;
+  if(onSave) onSave({correct:correct, total:total, percent:pct});
+}
+
+/* ============================================================
+   9. БЕТТЕР
+   ============================================================ */
+const view = $('#view');
+
+function go(route){ location.hash = '#/' + route; }
+
+function renderNav(active){
+  const items = [
+    {r:'home', t:'Басты бет'},
+    {r:'topics', t:'Оқу бөлімдері'},
+    {r:'lab', t:'Практикалық зертхана'},
+    {r:'tests', t:'Тесттер'},
+    {r:'final', t:'Қорытынды тест'},
+    {r:'progress', t:'Менің нәтижелерім'}
+  ];
+  $('#nav').innerHTML = items.map(i=>
+    '<button class="navb '+(active===i.r?'on':'')+'" data-go="'+i.r+'">'+i.t+'</button>'
+  ).join('');
+  $$('#nav .navb').forEach(b=> b.addEventListener('click', ()=> go(b.dataset.go)));
+}
+
+/* ---------- БАСТЫ БЕТ ---------- */
+function pageHome(){
+  const done = TOPICS.filter(t=> store.topic(t.id).done).length;
+  const pct = Math.round(done/TOPICS.length*100);
+  let h = '';
+  h += '<section class="hero">';
+  h += '<div>';
+  h += '<div class="sec-label">III БӨЛІМ · ИНФОРМАТИКА · 6-СЫНЫП</div>';
+  h += '<h1>Электрондық кесте арқылы есеп шығару</h1>';
+  h += '<p class="sub">Деректерді енгіз, формулаларды қолдан, кестені безендір және есептерді график арқылы көрсет!</p>';
+  h += '<div style="display:flex;gap:10px;flex-wrap:wrap">';
+  h += '<button class="btn" data-go="topic/t1">Оқуды бастау →</button>';
+  h += '<button class="btn ghost" data-go="lab">Зертханаға өту</button>';
+  h += '</div>';
+  h += '</div>';
+  h += '<div class="card pastel-g" style="margin:0">';
+  h += '<div class="small" style="font-weight:700;color:var(--green);margin-bottom:8px">▦ Кішкене кестені байқап көр</div>';
+  h += '<div class="sheetwrap"><table class="sheet" id="homeSheet">';
+  h += '<tr><th></th><th>A</th><th>B</th><th>C</th></tr>';
+  const data = [['Күн','1-сабақ','2-сабақ'],['Дүйсенбі','Математика','Қазақ тілі'],['Сейсенбі','Информатика','Тарих']];
+  data.forEach((row,ri)=>{
+    h += '<tr><th>'+(ri+1)+'</th>';
+    row.forEach(c=>{ h += '<td class="cell">'+c+'</td>'; });
+    h += '</tr>';
+  });
+  h += '</table></div>';
+  h += '<p class="small muted" style="margin-top:8px">Ұяшықты бас — ол жасыл жиекпен белгіленеді.</p>';
+  h += '</div>';
+  h += '</section>';
+
+  h += '<div class="card pastel-y" style="margin-top:22px">';
+  h += '<h3 style="margin-top:0">📈 Оқу прогресі</h3>';
+  h += '<p>Аяқталған тақырыптар: <b>'+done+' / '+TOPICS.length+'</b></p>';
+  h += '<div class="bar"><i style="width:'+pct+'%"></i></div>';
+  h += '<p class="small muted">'+pct+'% аяқталды</p>';
+  h += '</div>';
+
+  h += '<h2 style="margin-top:26px">Курс құрамы</h2>';
+  h += '<div class="grid g3">';
+  const blocks = [
+    ['📚','7 оқу тақырыбы','3.1 – 3.7 аралығындағы толық теория'],
+    ['🧪','Практикалық зертхана','7 интерактивті практикалық жұмыс'],
+    ['✍️','Интерактивті тапсырмалар','Әр тақырыпта 2 жазбаша тапсырма'],
+    ['📝','Тақырыптық тесттер','7 тест × 10 сұрақ = 70 сұрақ'],
+    ['🏁','Қорытынды тест','Бүкіл бөлім бойынша 30 сұрақ'],
+    ['📊','Менің нәтижелерім','Прогресс браузерде сақталады']
+  ];
+  blocks.forEach(b=>{
+    h += '<div class="card" style="margin:0"><div style="font-size:1.6rem">'+b[0]+'</div>'
+      + '<div style="font-weight:700;color:var(--green)">'+b[1]+'</div>'
+      + '<div class="small muted">'+b[2]+'</div></div>';
+  });
+  h += '</div>';
+
+  h += '<h2 style="margin-top:26px">Оқу тақырыптары</h2>';
+  h += '<div class="grid g2">';
+  TOPICS.forEach(t=>{
+    const st = store.topic(t.id);
+    const badge = st.done ? '<span class="pill">✓ Аяқталды</span>' : '<span class="pill y">Басталмаған</span>';
+    h += '<div class="tcard" data-go="topic/'+t.id+'">';
+    h += '<div class="ico">'+t.icon+'</div>';
+    h += '<div class="code">'+t.code+'</div>';
+    h += '<div class="tt">'+t.title+'</div>';
+    h += '<div class="st">'+badge+(st.test? ' <span class="pill cy">Тест: '+st.test.percent+'%</span>':'')+'</div>';
+    h += '</div>';
+  });
+  h += '</div>';
+
+  view.innerHTML = h;
+  /* басты беттегі кішкене кесте */
+  $$('#homeSheet td.cell').forEach(c=>{
+    c.addEventListener('click', ()=>{
+      $$('#homeSheet td.cell').forEach(x=>x.classList.remove('sel'));
+      c.classList.add('sel');
+    });
+  });
+  bindGo();
+}
+
+function bindGo(){
+  $$('[data-go]').forEach(b=>{
+    if(b.dataset.bound) return;
+    b.dataset.bound = '1';
+    b.addEventListener('click', ()=> go(b.dataset.go));
+  });
+}
+
+/* ---------- ТАҚЫРЫПТАР ТІЗІМІ ---------- */
+function pageTopics(){
+  let h = '<h1>Оқу бөлімдері</h1>';
+  h += '<p class="muted">III бөлім · Электрондық кесте арқылы есеп шығару · 7 тақырып</p>';
+  h += '<div class="grid g2">';
+  TOPICS.forEach((t,i)=>{
+    const st = store.topic(t.id);
+    h += '<div class="tcard" data-go="topic/'+t.id+'">';
+    h += '<div class="ico">'+t.icon+'</div>';
+    h += '<div class="code">'+t.code+'</div>';
+    h += '<div class="tt">'+t.title+'</div>';
+    h += '<div class="st">'+(st.done ? '<span class="pill">✓ Аяқталды</span>' : 'Оқу мақсаты: '+t.goal.slice(0,60)+'…')+'</div>';
+    h += '</div>';
+  });
+  h += '</div>';
+  view.innerHTML = h;
+  bindGo();
+}
+
+/* ---------- ТАҚЫРЫП БЕТІ ---------- */
+function pageTopic(id){
+  const idx = TOPICS.findIndex(t=>t.id===id);
+  const t = TOPICS[idx];
+  if(!t){ go('topics'); return; }
+  const st = store.topic(t.id);
+  let h = '';
+  h += '<div class="crumb">Басты бет / Оқу бөлімдері / <b>'+t.code+'</b></div>';
+  h += '<div class="chips">';
+  TOPICS.forEach(x=>{
+    h += '<button class="chip '+(x.id===t.id?'on':'')+'" data-go="topic/'+x.id+'">'+x.code+'</button>';
+  });
+  h += '</div>';
+
+  h += '<div class="card pastel-g">';
+  h += '<div style="font-size:2rem">'+t.icon+'</div>';
+  h += '<h1 style="margin-bottom:.2em">'+t.code+'. '+t.title+'</h1>';
+  h += '<p style="margin:0"><b>Оқу мақсаты:</b> '+t.goal+'</p>';
+  h += '</div>';
+
+  /* 1. Теория */
+  h += '<div class="card"><h2>📖 Теориялық материал</h2>'+t.theory+'</div>';
+  /* 2. Мысалдар */
+  h += '<div class="card pastel-cy"><h2>💡 Мысалдар</h2>'+t.examples+'</div>';
+  /* 3. Есте сақта */
+  h += '<div class="card pastel-y"><h3 style="margin-top:0">🧠 Есте сақта!</h3><p style="margin:0">'+t.remember+'</p></div>';
+  /* 4. Тапсырмалар */
+  h += '<h2 style="margin-top:24px">✍️ Интерактивті тапсырмалар</h2>';
+  t.tasks.forEach((task,i)=>{ h += taskBlock(task, i); });
+  /* 5. Тест */
+  h += '<h2 style="margin-top:24px">📝 Тақырыптық тест</h2>';
+  h += testBlock(t.test, 'test-'+t.id, t.code+' тақырыбы бойынша тест (10 сұрақ)');
+  /* 6. Өзін-өзі бағалау */
+  h += '<div class="card pastel-c" style="margin-top:18px">';
+  h += '<h3 style="margin-top:0">🌟 Өзін-өзі бағалау</h3>';
+  h += '<p class="small">Осы тақырыпты қаншалықты түсіндің? Жұлдызшаларды таңда.</p>';
+  h += '<div class="stars" data-stars="'+t.id+'">';
+  for(let i=1;i<=5;i++) h += '<span data-v="'+i+'" class="'+(st.self>=i?'on':'')+'">★</span>';
+  h += '</div>';
+  h += '<p class="small muted" data-star-txt style="margin-top:8px">'+(st.self? 'Бағаң: '+st.self+'/5' : 'Әзірге баға қойылмаған')+'</p>';
+  h += '</div>';
+  /* 7. Келесі тақырып */
+  h += '<div class="nav-end">';
+  if(idx > 0) h += '<button class="btn ghost" data-go="topic/'+TOPICS[idx-1].id+'">← '+TOPICS[idx-1].code+'</button>';
+  else h += '<span></span>';
+  if(idx < TOPICS.length-1) h += '<button class="btn" data-go="topic/'+TOPICS[idx+1].id+'">'+TOPICS[idx+1].code+'. '+TOPICS[idx+1].title.slice(0,26)+'… →</button>';
+  else h += '<button class="btn alt" data-go="lab">Практикалық зертхана →</button>';
+  h += '</div>';
+
+  view.innerHTML = h;
+  window.scrollTo({top:0, behavior:'instant' in window ? 'instant' : 'auto'});
+
+  initWidgets(view);
+  bindGo();
+
+  /* тапсырмалар */
+  $$('.task').forEach(box=>{
+    const i = parseInt(box.dataset.task,10);
+    const task = t.tasks[i];
+    $('[data-check-task]', box).addEventListener('click', ()=> checkTask(box, task));
+    $('[data-clear-task]', box).addEventListener('click', ()=>{
+      $$('[data-f]', box).forEach(inp=>{
+        inp.value = '';
+        const fe = inp.closest('.field');
+        if(fe){ fe.classList.remove('ok','no'); const m=$('.mark',fe); if(m) m.textContent=''; }
+        inp.style.borderColor = ''; inp.style.background = '';
+      });
+      const fb = $('[data-task-fb]', box); fb.style.display='none';
+    });
+  });
+
+  /* тест */
+  const tbox = $('[data-test="test-'+t.id+'"]');
+  $('[data-check-test]', tbox).addEventListener('click', ()=>{
+    checkTest(tbox, t.test, 'test-'+t.id, (res)=>{
+      const s = store.topic(t.id);
+      s.test = res;
+      store.save();
+    });
+  });
+  $('[data-retry-test]', tbox).addEventListener('click', ()=>{
+    $$('input[type=radio]', tbox).forEach(r=> r.checked = false);
+    $$('.opt', tbox).forEach(o=> o.classList.remove('correct','wrong'));
+    $('[data-test-res]', tbox).innerHTML = '';
+    tbox.scrollIntoView({behavior:'smooth', block:'start'});
+  });
+
+  /* жұлдызшалар */
+  $$('[data-stars="'+t.id+'"] span').forEach(sp=>{
+    sp.addEventListener('click', ()=>{
+      const v = parseInt(sp.dataset.v,10);
+      const s = store.topic(t.id);
+      s.self = v;
+      s.done = true;
+      store.save();
+      $$('[data-stars="'+t.id+'"] span').forEach(x=> x.classList.toggle('on', parseInt(x.dataset.v,10) <= v));
+      $('[data-star-txt]').textContent = 'Бағаң: '+v+'/5 — нәтиже сақталды ✓';
+    });
+  });
+}
+
+/* ---------- ЗЕРТХАНА ---------- */
+function pageLab(){
+  let h = '<h1>🧪 Spreadsheet Lab — Практикалық зертхана</h1>';
+  h += '<p class="muted">7 практикалық жұмыс. Әр жұмыста мақсат, қажетті деректер, орындау қадамдары, интерактивті жұмыс аймағы және тексеру бар.</p>';
+  PRACTICE.forEach((p,i)=>{
+    const done = store.data.practice[p.id];
+    h += '<div class="card" data-lab="'+p.id+'">';
+    h += '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap">';
+    h += '<h2 style="margin:0">'+p.icon+' '+p.title+'</h2>';
+    h += done ? '<span class="pill">✓ Орындалды</span>' : '<span class="pill y">Орындалмаған</span>';
+    h += '</div>';
+    h += '<p style="margin-top:10px"><b>Мақсаты:</b> '+p.goal+'</p>';
+    h += '<p><b>Қажетті деректер:</b> '+p.data+'</p>';
+    h += '<p style="margin-bottom:4px"><b>Орындау қадамдары:</b></p><ol>';
+    p.steps.forEach(s=> h += '<li>'+s+'</li>');
+    h += '</ol>';
+    h += '<p style="margin-bottom:4px"><b>Интерактивті жұмыс аймағы:</b></p>';
+    h += p.html;
+    h += '<div class="fields" style="margin-top:14px">';
+    p.fields.forEach((f,fi)=>{
+      const hasHtmlInputs = p.html.indexOf('data-f=') !== -1;
+      if(hasHtmlInputs) return;
+      h += '<div class="field" data-fi="'+fi+'"><label>'+(fi+1)+') '+f.label+'</label>'
+        + '<input type="text" data-pf="'+fi+'" placeholder="жауабыңды жаз"><span class="mark"></span></div>';
+    });
+    h += '</div>';
+    h += '<div style="margin-top:12px"><button class="btn" data-check-lab>Тексеру</button></div>';
+    h += '<div class="fb" data-lab-fb style="display:none"></div>';
+    h += '<p class="small muted" style="margin-top:10px"><b>Бағалау критерийлері:</b> '+p.criteria+'</p>';
+    h += '</div>';
+  });
+  view.innerHTML = h;
+  window.scrollTo(0,0);
+  initWidgets(view);
+
+  PRACTICE.forEach(p=>{
+    const box = $('[data-lab="'+p.id+'"]');
+    $('[data-check-lab]', box).addEventListener('click', ()=>{
+      const hasHtmlInputs = p.html.indexOf('data-f=') !== -1;
+      const selector = hasHtmlInputs ? '[data-f]' : '[data-pf]';
+      const inputs = $$(selector, box);
+      let correct = 0;
+      const details = [];
+      inputs.forEach(inp=>{
+        const i = parseInt(hasHtmlInputs ? inp.dataset.f : inp.dataset.pf, 10);
+        const f = p.fields[i];
+        if(!f) return;
+        const answers = (typeof f.a === 'function') ? f.a() : f.a;
+        const ok = String(inp.value).trim() !== '' && answers.some(a=> match(inp.value, a));
+        if(ok) correct++;
+        details.push({label:f.label, ok:ok, val:inp.value, ans:answers[0]});
+        const fe = inp.closest('.field');
+        if(fe){
+          fe.classList.toggle('ok', ok);
+          fe.classList.toggle('no', !ok);
+          const m = $('.mark', fe);
+          if(m) m.textContent = ok ? '✓' : '✗';
+        }else{
+          inp.style.borderColor = ok ? '#2E8B62' : '#FF6B5B';
+          inp.style.background = ok ? '#F1FAF5' : '#FFF4F2';
+        }
+      });
+      const total = p.fields.length;
+      const pct = Math.round(correct/total*100);
+      const fb = $('[data-lab-fb]', box);
+      fb.style.display = 'block';
+      fb.className = 'fb ' + (pct === 100 ? 'good' : (pct >= 60 ? 'good' : 'bad'));
+      let msg = pct === 100
+        ? '🎉 Тамаша! Практикалық жұмыс толық орындалды ('+correct+'/'+total+').'
+        : 'Дұрыс жауап: '+correct+'/'+total+' ('+pct+'%). '+(pct>=60?'Аздап түзету керек.':'Қадамдарды қайта орындап көр.');
+      let list = '';
+      details.forEach(d=>{
+        if(!d.ok) list += '<li>«'+esc(d.label)+'» — сенің жауабың: <b>'+(d.val?esc(d.val):'бос')+'</b>, дұрысы: <b>'+esc(d.ans)+'</b></li>';
+      });
+      fb.innerHTML = '<b>'+msg+'</b>' + (list ? '<ul>'+list+'</ul>' : '');
+      if(pct >= 60){
+        store.data.practice[p.id] = true;
+        store.save();
+      }
+    });
+  });
+}
+
+/* ---------- ТЕСТТЕР ТІЗІМІ ---------- */
+function pageTests(){
+  let h = '<h1>📝 Тақырыптық тесттер</h1>';
+  h += '<p class="muted">Әр тақырып бойынша 10 сұрақтан. Барлығы 70 сұрақ.</p>';
+  TOPICS.forEach(t=>{
+    const st = store.topic(t.id);
+    h += '<div class="card" style="display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap">';
+    h += '<div><div class="pill">'+t.code+'</div><div style="font-weight:700;color:var(--green);margin-top:6px">'+t.icon+' '+t.title+'</div>'
+      + '<div class="small muted">10 сұрақ · 4 жауап нұсқасы</div></div>';
+    h += '<div style="text-align:right">';
+    h += st.test ? '<div class="pill '+(st.test.percent>=75?'':'y')+'">Нәтиже: '+st.test.percent+'%</div><br>' : '<div class="pill y">Тапсырылмаған</div><br>';
+    h += '<button class="btn sm" style="margin-top:8px" data-go="topic/'+t.id+'">Тестті тапсыру →</button>';
+    h += '</div></div>';
+  });
+  h += '<div class="card pastel-cy"><h3 style="margin-top:0">🏁 Қорытынды тест</h3><p>Бүкіл III бөлім бойынша 30 сұрақ.</p><button class="btn alt" data-go="final">Қорытынды тестке өту →</button></div>';
+  view.innerHTML = h;
+  bindGo();
+}
+
+/* ---------- ҚОРЫТЫНДЫ ТЕСТ ---------- */
+function pageFinal(){
+  let h = '<h1>🏁 Қорытынды тест</h1>';
+  h += '<p class="muted">III бөлім бойынша 30 сұрақ. Барлық жеті тақырып қамтылған. Жауаптар тест аяқталған соң тексеріледі.</p>';
+  h += '<div class="card pastel-y"><b>Бағалау шкаласы:</b><ul style="margin:6px 0 0">'
+    + '<li>90–100% — Өте жақсы! 🏆</li><li>75–89% — Жақсы! 👍</li>'
+    + '<li>50–74% — Қайталап оқы. 📖</li><li>0–49% — Теорияны қайта қарап, тағы тапсыр. 📚</li></ul></div>';
+  h += testBlock(FINAL_TEST, 'finaltest', 'Қорытынды тест · 30 сұрақ');
+  view.innerHTML = h;
+  window.scrollTo(0,0);
+
+  const box = $('[data-test="finaltest"]');
+  $('[data-check-test]', box).addEventListener('click', ()=>{
+    checkTest(box, FINAL_TEST, 'finaltest', (res)=>{
+      store.data.final = res;
+      store.save();
+    });
+  });
+  $('[data-retry-test]', box).addEventListener('click', ()=>{
+    $$('input[type=radio]', box).forEach(r=> r.checked = false);
+    $$('.opt', box).forEach(o=> o.classList.remove('correct','wrong'));
+    $('[data-test-res]', box).innerHTML = '';
+    box.scrollIntoView({behavior:'smooth', block:'start'});
+  });
+}
+
+/* ---------- МЕНІҢ НӘТИЖЕЛЕРІМ ---------- */
+function pageProgress(){
+  let h = '<h1>📊 Менің нәтижелерім</h1>';
+  let sumPct = 0, cnt = 0;
+  let testsDone = 0;
+
+  h += '<div class="card"><h2>Аяқталған тақырыптар</h2>';
+  TOPICS.forEach(t=>{
+    const st = store.topic(t.id);
+    if(st.test){ sumPct += st.test.percent; cnt++; }
+    if(st.test) testsDone++;
+    h += '<div class="prow">';
+    h += '<div><b>'+t.code+'.</b> '+t.icon+' '+t.title+'</div>';
+    h += '<div style="display:flex;gap:8px;flex-wrap:wrap">';
+    h += st.done ? '<span class="pill">✓ Аяқталды</span>' : '<span class="pill y">Оқылмаған</span>';
+    h += st.self ? '<span class="pill cy">Өзін-өзі бағалау: '+st.self+'/5</span>' : '';
+    h += st.test ? '<span class="pill '+(st.test.percent>=75?'':'y')+'">Тест: '+st.test.percent+'% ('+st.test.correct+'/'+st.test.total+')</span>' : '<span class="pill y">Тест: —</span>';
+    h += '</div></div>';
+  });
+  h += '</div>';
+
+  /* практика */
+  h += '<div class="card"><h2>Практикалық жұмыстар</h2>';
+  PRACTICE.forEach(p=>{
+    const d = !!store.data.practice[p.id];
+    h += '<div class="prow"><div>'+p.icon+' '+p.title+'</div>'
+      + (d ? '<span class="pill">✓ Орындалды</span>' : '<span class="pill y">Орындалмаған</span>') + '</div>';
+  });
+  h += '</div>';
+
+  /* орташа */
+  const avg = cnt ? Math.round(sumPct/cnt) : 0;
+  h += '<div class="card pastel-g"><h2>Жалпы көрсеткіштер</h2>';
+  h += '<p><b>Тапсырылған тақырыптық тесттер:</b> '+testsDone+' / 7</p>';
+  h += '<p><b>Тақырыптық тесттердің орташа пайызы:</b> '+avg+'%</p>';
+  h += '<div class="bar"><i style="width:'+avg+'%"></i></div>';
+  if(store.data.final){
+    const f = store.data.final;
+    let g = f.percent>=90 ? 'Өте жақсы! 🏆' : f.percent>=75 ? 'Жақсы! 👍' : f.percent>=50 ? 'Қайталап оқы. 📖' : 'Теорияны қайта қарап, тағы тапсыр. 📚';
+    h += '<p style="margin-top:14px"><b>Қорытынды тест:</b> '+f.percent+'% ('+f.correct+'/'+f.total+') — '+g+'</p>';
+    h += '<div class="bar"><i style="width:'+f.percent+'%"></i></div>';
+  }else{
+    h += '<p style="margin-top:14px" class="muted">Қорытынды тест әлі тапсырылмаған.</p>';
+  }
+  h += '</div>';
+
+  h += '<div class="card"><h3 style="margin-top:0">♻️ Нәтижелерді тазалау</h3>'
+    + '<p class="small muted">Барлық сақталған нәтижелер осы браузерден өшіріледі.</p>'
+    + '<button class="btn alt" id="resetBtn">Барлығын тазалау</button></div>';
+
+  h += '<p class="note">Нәтижелер браузердің <b>localStorage</b> жадында сақталады. Бетті жаңартқанда олар жоғалмайды. Егер басқа компьютерде немесе браузерде ашсаң, нәтижелер көрінбейді.</p>';
+
+  view.innerHTML = h;
+  $('#resetBtn').addEventListener('click', ()=>{
+    if(confirm('Барлық нәтижелерді тазалауға сенімдісің бе?')){
+      store.reset();
+      go('progress');
+      render();
+    }
+  });
+}
+
+/* ============================================================
+   10. РОУТЕР
+   ============================================================ */
+function render(){
+  const hash = location.hash.replace(/^#\//, '') || 'home';
+  const parts = hash.split('/');
+  const page = parts[0];
+  const param = parts[1];
+
+  if(page === 'topic' && param){ renderNav('topics'); pageTopic(param); return; }
+
+  switch(page){
+    case 'home': renderNav('home'); pageHome(); break;
+    case 'topics': renderNav('topics'); pageTopics(); break;
+    case 'lab': renderNav('lab'); pageLab(); break;
+    case 'tests': renderNav('tests'); pageTests(); break;
+    case 'final': renderNav('final'); pageFinal(); break;
+    case 'progress': renderNav('progress'); pageProgress(); break;
+    default: renderNav('home'); pageHome();
+  }
+}
+
+window.addEventListener('hashchange', render);
+render();
+</script>
+</body>
+</html>
